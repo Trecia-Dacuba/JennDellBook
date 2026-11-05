@@ -91,7 +91,16 @@ th{font-weight:700;border-top:0}
    browser). To use the real Firebase database, paste your web-app config:
    const FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",storageBucket:"...",messagingSenderId:"...",appId:"..."};
    ===================================================================== */
-const FIREBASE_CONFIG = null;
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDrDi83zkrwz36hX7qHhrYAWnLT6UeEAiA",
+  authDomain: "jenndellbook.firebaseapp.com",
+  projectId: "jenndellbook",
+  storageBucket: "jenndellbook.firebasestorage.app",
+  messagingSenderId: "608560989008",
+  appId: "1:608560989008:web:90578eef062c8d52762255"
+};
+   true = use Firebase Cloud Storage (needs the Blaze pay-as-you-go plan, and storage.rules published). */
+const USE_CLOUD_STORAGE = false;
 
 /* ---------------------------------------------------------------------
    Small helpers
@@ -144,12 +153,12 @@ const logDoc=a=>({at:Date.now(),by:S.user.name,role:S.user.role,a});
 /* ---------------------------------------------------------------------
    Image helper: shrink a payment screenshot before it is stored
    --------------------------------------------------------------------- */
-async function shrink(file){
+async function shrink(file,small){
   if(!/^image\//.test(file.type))throw new Error('notimage');
-  const bmp=await createImageBitmap(file),sc=Math.min(1,900/Math.max(bmp.width,bmp.height));
+  const bmp=await createImageBitmap(file),sc=Math.min(1,(small?640:900)/Math.max(bmp.width,bmp.height));
   const c=document.createElement('canvas');c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);
   c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
-  const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.7));
+  const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',small?.55:.7));
   const url=await new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(blob)});
   return{blob,url}}
 
@@ -226,8 +235,8 @@ const Local={
    ===================================================================== */
 async function makeFirebase(cfg){
   const base='https://www.gstatic.com/firebasejs/10.14.1/firebase-';
-  const [A,Au,F,St]=await Promise.all(['app','auth','firestore','storage'].map(n=>import(base+n+'.js')));
-  const app=A.initializeApp(cfg),auth=Au.getAuth(app),fs=F.getFirestore(app),st=St.getStorage(app);
+  const [A,Au,F,St]=await Promise.all(['app','auth','firestore',...(USE_CLOUD_STORAGE?['storage']:[])].map(n=>import(base+n+'.js')));
+  const app=A.initializeApp(cfg),auth=Au.getAuth(app),fs=F.getFirestore(app),st=USE_CLOUD_STORAGE?St.getStorage(app):null;
   const clean=o=>JSON.parse(JSON.stringify(o));
   let unsubs=[];const stop=()=>{unsubs.forEach(u=>u());unsubs=[]};
   const readProfile=async u=>{const s=await F.getDoc(F.doc(fs,'users',u.uid));return s.exists()?{uid:u.uid,email:u.email,...s.data()}:null};
@@ -262,7 +271,8 @@ async function makeFirebase(cfg){
     async set(c,id,o){await F.setDoc(F.doc(fs,c,id),clean(o))},
     async update(c,id,p){await F.updateDoc(F.doc(fs,c,id),clean(p))},
     async del(c,id){await F.deleteDoc(F.doc(fs,c,id))},
-    async uploadProof(owner,apptId,shrunk){const r=St.ref(st,`proofs/${owner}/${apptId}/${Date.now()}.jpg`);
+    async uploadProof(owner,apptId,shrunk){if(!USE_CLOUD_STORAGE)return shrunk.url;        // small image stored in the booking record
+      const r=St.ref(st,`proofs/${owner}/${apptId}/${Date.now()}.jpg`);
       await St.uploadBytes(r,shrunk.blob,{contentType:'image/jpeg'});return St.getDownloadURL(r)},
     async exportAll(){const out={};for(const c of['services','therapists','appointments','users','log','settings','slots']){
       const s=await F.getDocs(F.collection(fs,c));out[c]={};s.docs.forEach(d=>out[c][d.id]=d.data())}return out},
@@ -357,7 +367,7 @@ const sendProof=run(async id=>{
   const ref=$('#ref'+id).value.trim(),f=$('#file'+id).files[0];
   if(!ref||!f)return toast('Enter the GCash reference number and attach a screenshot.');
   if(!/^[A-Za-z0-9-]{6,30}$/.test(ref))return toast('The reference number should be 6 to 30 letters or digits.');
-  const sh=await shrink(f),a0=D.appointments.find(x=>x.id===id);
+  const sh=await shrink(f,DB.mode==='firebase'&&!USE_CLOUD_STORAGE),a0=D.appointments.find(x=>x.id===id);
   const url=await DB.uploadProof(S.user.uid,id,sh);
   await DB.txn(async t=>{
     const a=await t.get('appointments',id);if(!a||a.status!=='Pending Payment'||(a.holdUntil&&a.holdUntil<Date.now()))throw new Error('stale');
