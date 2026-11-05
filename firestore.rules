@@ -1,0 +1,69 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function me()       { return get(/databases/$(db)/documents/users/$(request.auth.uid)).data; }
+    function isAdmin()  { return signedIn() && me().role == 'admin'; }
+    function isStaff()  { return signedIn() && me().role in ['staff', 'admin']; }
+    function isTherapist() { return signedIn() && me().role == 'therapist'; }
+    function now()      { return request.time.toMillis(); }
+
+    // ---- users: self-registration can only ever create a CLIENT ----
+    match /users/{uid} {
+      allow read:   if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if signedIn() && ((request.auth.uid == uid && request.resource.data.role == 'client') || isAdmin());
+      allow update: if isAdmin() || (request.auth.uid == uid &&
+                       request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name', 'phone']));
+      allow delete: if isAdmin();
+    }
+
+    // ---- catalogue and policy: everyone signed in reads, only the owner writes ----
+    match /services/{id}   { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /therapists/{id} { allow read: if signedIn(); allow write: if isAdmin(); }
+    match /settings/{id}   { allow read: if signedIn(); allow write: if isAdmin(); }
+
+    // ---- slot locks = conflict detection ----
+    // A lock may be created only if none exists, or the existing one has expired
+    // (or the writer is staff, or it already belongs to the same booking).
+    function apptAfter(id) { return getAfter(/databases/$(db)/documents/appointments/$(id)).data; }
+    function apptNow(id)   { return get(/databases/$(db)/documents/appointments/$(id)).data; }
+    match /slots/{slotId} {
+      allow read: if signedIn();
+      allow create, update: if signedIn()
+        && request.resource.data.keys().hasOnly(['apptId', 'th', 'date', 'holdUntil'])
+        && (isStaff() || apptAfter(request.resource.data.apptId).cid == request.auth.uid)
+        && (request.resource.data.holdUntil == null || request.resource.data.holdUntil <= now() + 7200000
+            || (apptAfter(request.resource.data.apptId).status == 'Pending Verification' && request.resource.data.holdUntil <= now() + 90000000))
+        && (request.resource.data.holdUntil != null || isStaff()
+            || apptAfter(request.resource.data.apptId).status in ['Pending Verification', 'Confirmed'])
+        && (resource == null || isStaff()
+            || resource.data.apptId == request.resource.data.apptId
+            || (resource.data.holdUntil != null && resource.data.holdUntil < now()));
+      allow delete: if signedIn() && (isStaff() || apptNow(resource.data.apptId).cid == request.auth.uid);
+    }
+
+    // ---- appointments ----
+    function clientMayChange() {
+      return request.resource.data.status == resource.data.status
+          || request.resource.data.status == 'Cancelled'
+          || (resource.data.status == 'Pending Payment' && request.resource.data.status == 'Pending Verification'
+              && request.resource.data.proofs.size() == resource.data.proofs.size() + 1);
+    }
+    match /appointments/{id} {
+      allow read: if signedIn() && (isStaff() || resource.data.cid == request.auth.uid
+                                    || (isTherapist() && resource.data.th == me().thId));
+      allow create: if signedIn() && (isStaff() ||
+                       (request.resource.data.cid == request.auth.uid && request.resource.data.status == 'Pending Payment'));
+      allow update: if signedIn() && (isStaff()
+                       || (resource.data.cid == request.auth.uid && request.resource.data.cid == resource.data.cid && clientMayChange())
+                       || (isTherapist() && resource.data.th == me().thId
+                           && resource.data.status == 'Confirmed' && request.resource.data.status == 'Completed'));
+      allow delete: if isAdmin();
+    }
+
+    // ---- SMS-style notifications and audit log ----
+    match /notes/{id} { allow read: if signedIn() && resource.data.to == request.auth.uid; allow create: if signedIn(); }
+    match /log/{id}   { allow read: if isAdmin(); allow create: if signedIn() && me().role != 'client'; }
+  }
+}

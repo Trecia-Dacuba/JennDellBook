@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JendellBook</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef2f0;--surface:#fff;--ink:#15303a;--muted:#566b72;--line:#d3ddd9;--jade:#2c7a6a;--on-jade:#fff;--gold:#946414;--bad:#a8402f;--chip:#e3ece8;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1d22;--surface:#17292f;--ink:#e6efec;--muted:#9bb0b0;--line:#2a4046;--jade:#4fb39d;--on-jade:#0f1d22;--gold:#e0b25a;--bad:#e8806e;--chip:#1f363d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1d22;--surface:#17292f;--ink:#e6efec;--muted:#9bb0b0;--line:#2a4046;--jade:#4fb39d;--on-jade:#0f1d22;--gold:#e0b25a;--bad:#e8806e;--chip:#1f363d;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "DM Sans",system-ui,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:16px max(20px,5vw);border-bottom:1px solid var(--line);background:var(--surface)}
+.brand{font:700 26px/1 Fraunces,Georgia,serif;letter-spacing:-.01em}
+.brand small{display:block;font:400 13px "DM Sans",sans-serif;color:var(--muted);margin-top:4px;letter-spacing:0}
+main{max-width:1000px;margin:0 auto;padding:28px max(20px,5vw) 80px}
+h1{font:700 30px/1.15 Fraunces,Georgia,serif;margin:0 0 4px}
+h2{font:700 20px/1.2 Fraunces,Georgia,serif;margin:0 0 12px}
+h3{font:700 15px Fraunces,Georgia,serif;margin:16px 0 6px}
+.lead{color:var(--muted);margin:0 0 24px;max-width:60ch}
+.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
+.panel.gap{margin-top:20px}
+label{display:block;font-weight:500;font-size:14px;margin:14px 0 6px}
+select,input[type=text],input[type=number],input[type=password],input[type=email],input[type=tel]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+input[type=file]{font-size:14px;max-width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 12px;border-radius:8px;font:inherit;font-size:14px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--jade);color:var(--on-jade);border-color:var(--jade)}
+.chip:disabled{opacity:.4;text-decoration:line-through;cursor:not-allowed}
+.btn{background:var(--jade);color:var(--on-jade);border:0;padding:11px 18px;border-radius:8px;font:700 15px inherit;font-family:inherit;cursor:pointer}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn.bad{background:var(--bad);color:#fff}
+.btn.sm{padding:7px 12px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:14px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0;padding-top:0}
+.row p{margin:2px 0;color:var(--muted);font-size:14px}
+.row b{font-weight:700}
+.pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;font-weight:700;background:var(--chip);white-space:nowrap}
+.pill.Confirmed,.pill.Completed{background:var(--jade);color:var(--on-jade)}
+.pill.Rejected,.pill.Cancelled{background:var(--bad);color:#fff}
+.pill.Pending{background:var(--gold);color:#fff}
+.empty{color:var(--muted);font-size:14px;margin:0}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-top:1px solid var(--line)}
+th{font-weight:700;border-top:0}
+.scroll{overflow-x:auto}
+.proof{background:var(--bg);border-radius:10px;padding:12px;margin-top:10px}
+.note{font-size:13px;color:var(--muted);margin-top:10px}
+.auth{max-width:440px;margin:0 auto}
+.seg{display:flex;gap:4px;background:var(--chip);padding:4px;border-radius:10px;margin-bottom:6px}
+.seg button{flex:1;border:0;background:none;color:var(--muted);padding:9px;border-radius:7px;font-weight:500;font-size:14px;font-family:inherit;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
+.bar{height:8px;border-radius:4px;background:var(--jade);min-width:2px}
+.hold{color:var(--gold);font-weight:700}
+.tag{font-size:13px;color:var(--bad);font-weight:700}
+.who{display:flex;gap:12px;align-items:center;font-size:14px}.who span{color:var(--muted)}
+.link{background:none;border:0;color:var(--jade);font:inherit;font-weight:700;cursor:pointer;padding:0;text-decoration:underline}
+.banner{background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:13px;color:var(--muted);margin-bottom:20px}
+.banner.ok{border-color:var(--jade);color:var(--ink)}
+.banner.err{border-color:var(--bad);color:var(--bad)}
+.thumb{display:block;max-width:150px;max-height:110px;border-radius:8px;border:1px solid var(--line);margin-top:8px;cursor:zoom-in}
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;z-index:20}
+#lightbox.on{display:flex}
+#lightbox img{max-width:100%;max-height:100%;border-radius:10px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:11px 18px;border-radius:10px;font-size:14px;max-width:90vw;opacity:0;pointer-events:none;transition:opacity .2s;z-index:30}
+#toast.on{opacity:1}
+@media(prefers-reduced-motion:reduce){#toast{transition:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">JendellBook<small>JENDELL Massage and Spa · online booking</small></div>
+  <div id="tabs" class="who"></div>
+</header>
+<main id="app"><p class="empty">Loading…</p></main>
+<div id="lightbox" role="dialog" aria-label="Payment screenshot" onclick="this.classList.remove('on')"><img alt="Payment screenshot"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<script>
+/* =====================================================================
+   SETTINGS
+   Leave FIREBASE_CONFIG as null to run in DEMO MODE (data is saved in this
+   browser). To use the real Firebase database, paste your web-app config:
+   const FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",storageBucket:"...",messagingSenderId:"...",appId:"..."};
+   ===================================================================== */
+const FIREBASE_CONFIG = null;
+
+/* ---------------------------------------------------------------------
+   Small helpers
+   --------------------------------------------------------------------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>'x'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+const pad=n=>String(n).padStart(2,'0');
+const dkey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());       // local date, not UTC
+const fmt=ms=>new Date(ms).toLocaleString('en-PH',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+const TIMES=['10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];   // 1-hour slots, spa closes at 18:00
+const LIVE=['Pending Payment','Pending Verification','Confirmed','Completed'];
+const DEFAULTS={holdMin:30,cutoffH:2,verifyH:0};   // verifyH: 0 = no time limit for staff once proof is sent
+let _dc=null;
+function days(){const k=dkey(new Date());if(_dc&&_dc.k===k)return _dc.v;
+  const v=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()+i);return{key:dkey(d),label:d.toLocaleDateString('en-PH',{weekday:'short',month:'short',day:'numeric'})}});
+  _dc={k,v};return v}
+const dayLabel=k=>(days().find(d=>d.key===k)||{label:k}).label;
+const startMs=(date,time)=>{const[y,m,d]=date.split('-').map(Number),[h,i]=time.split(':').map(Number);return new Date(y,m-1,d,h,i).getTime()};
+const isPast=(date,time)=>startMs(date,time)<=Date.now();
+
+/* In-memory cache that the screens read from. The database adapters keep it live. */
+const D={users:[],services:[],therapists:[],appointments:[],slots:{},notes:[],log:[],settings:{...DEFAULTS}};
+const S={user:null,mode:'client',reg:false,resch:null,ready:false,busy:false,fatal:null,race:false,thView:null,exp:new Set(),dirty:false,
+  walk:{svc:null,th:null,day:null,time:null,name:''},sel:{svc:null,th:null,day:null,time:null}};
+let DB=null;
+
+const svc=id=>D.services.find(x=>x.id===id)||{name:'—',mins:60,price:0};
+const thr=id=>D.therapists.find(x=>x.id===id)||{name:'—',spec:''};
+const pill=s=>`<span class="pill ${s.split(' ')[0]}">${s}</span>`;
+
+/* ---------------------------------------------------------------------
+   Slot locking = conflict detection.
+   Every hour a therapist works is a "slot" document with a deterministic id.
+   A booking must create ALL the slot documents it needs inside ONE
+   transaction; if any already exists (and is still live) the whole booking
+   is rejected. That is what makes double-booking impossible.
+   A 90-minute service locks two consecutive hours.
+   --------------------------------------------------------------------- */
+const slotId=(th,date,time)=>th+'_'+date+'_'+time.replace(':','');
+function needed(th,date,time,mins){const i=TIMES.indexOf(time),n=Math.ceil(mins/60);if(i<0||i+n>TIMES.length)return null;return TIMES.slice(i,i+n).map(t=>slotId(th,date,t))}
+const slotLive=l=>!!l&&(l.holdUntil==null||l.holdUntil>Date.now());
+function free(th,date,time,mins,mine){
+  const ids=needed(th,date,time,mins);if(!ids||isPast(date,time))return false;
+  return ids.every(i=>{const l=D.slots[i];return !slotLive(l)||(mine&&l.apptId===mine)})}
+const lockDoc=(a,holdUntil)=>({apptId:a.id,th:a.th,date:a.date,holdUntil});
+const note=(to,m,ph)=>({to,m:('JENDELL: '+m).slice(0,160),ph:ph||'',t:Date.now()});
+const logDoc=a=>({at:Date.now(),by:S.user.name,role:S.user.role,a});
+
+/* ---------------------------------------------------------------------
+   Image helper: shrink a payment screenshot before it is stored
+   --------------------------------------------------------------------- */
+async function shrink(file){
+  if(!/^image\//.test(file.type))throw new Error('notimage');
+  const bmp=await createImageBitmap(file),sc=Math.min(1,900/Math.max(bmp.width,bmp.height));
+  const c=document.createElement('canvas');c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);
+  c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+  const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',.7));
+  const url=await new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(blob)});
+  return{blob,url}}
+
+/* =====================================================================
+   DATABASE ADAPTER 1: LOCAL (demo mode). Saved in this browser's storage.
+   Same interface as the Firebase adapter, so the app code never changes.
+   ===================================================================== */
+const COLS=['users','services','therapists','appointments','slots','notes','log','settings'];
+const LKEY='jendellbook.db.v1';
+let memStore=null;                                    // used only if browser storage is blocked
+const store={get(){try{return localStorage.getItem(LKEY)}catch(e){return memStore}},set(v){try{localStorage.setItem(LKEY,v)}catch(e){memStore=v}},clear(){try{localStorage.removeItem(LKEY)}catch(e){}memStore=null}};
+async function sha(s){
+  if(crypto&&crypto.subtle){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  let h=5381;for(const c of s)h=((h<<5)+h+c.charCodeAt(0))|0;return 'weak'+h}      // fallback, demo only
+const ss={get:k=>{try{return sessionStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{sessionStorage.setItem(k,v)}catch(e){}},del:k=>{try{sessionStorage.removeItem(k)}catch(e){}}};
+const Local={
+  mode:'local',cb:()=>{},
+  on(fn){this.cb=fn},
+  load(){let o=null;try{o=JSON.parse(store.get())}catch(e){}if(!o)return null;COLS.forEach(c=>o[c]=o[c]||{});return o},
+  async init(){if(!this.load())await this.seed();addEventListener('storage',e=>{if(e.key===LKEY)this.pull()});this.pull(true)},
+  pull(silent){
+    const db=this.load();if(!db)return;const arr=c=>Object.entries(db[c]).map(([id,o])=>({id,...o}));
+    D.users=arr('users');D.services=arr('services');D.therapists=arr('therapists');D.appointments=arr('appointments');
+    D.slots=db.slots;D.notes=arr('notes').sort((a,b)=>b.t-a.t);D.log=arr('log').sort((a,b)=>b.at-a.at).slice(0,100);
+    D.settings={...DEFAULTS,...(db.settings.main||{})};if(!silent)this.cb()},
+  async seed(){
+    const db={};COLS.forEach(c=>db[c]={});
+    db.services={s1:{name:'Swedish massage',mins:60,price:700,on:true},s2:{name:'Deep tissue massage',mins:60,price:850,on:true},s3:{name:'Hot stone therapy',mins:90,price:1200,on:true}};
+    db.therapists={t1:{name:'Marites',spec:'Swedish, aromatherapy',on:true},t2:{name:'Joyce',spec:'Deep tissue, sports',on:true},t3:{name:'Lorna',spec:'Hot stone',on:true}};
+    const mk=async(id,email,pw,name,role,extra)=>{const salt=uid();db.users[id]={email,name,role,salt,hash:await sha(salt+pw),...extra}};
+    await mk('u1','demo@client.ph','client123','Maria Santos','client',{phone:'0917 000 0000'});
+    await mk('u2','staff@jendell.ph','staff123','Front Desk','staff');
+    await mk('u3','admin@jendell.ph','admin123','Owner','admin');
+    await mk('u4','marites@jendell.ph','therapist123','Marites','therapist',{thId:'t1'});
+    await mk('u5','joyce@jendell.ph','therapist123','Joyce','therapist',{thId:'t2'});
+    await mk('u6','lorna@jendell.ph','therapist123','Lorna','therapist',{thId:'t3'});
+    const today=dkey(new Date()),seedAppt=(id,who,sv,th,time)=>{const s=slotId(th,today,time);
+      db.appointments[id]={who,cid:null,ph:'',svc:sv,th,date:today,time,slots:[s],status:'Confirmed',holdUntil:null,proofs:[{ref:'GC'+id,file:'seed.png',url:'',st:'Verified'}],created:Date.now()};
+      db.slots[s]={apptId:id,th,date:today,holdUntil:null}};
+    seedAppt('a1','Ana R.','s2','t2','11:00');seedAppt('a2','Ben L.','s1','t1','13:00');
+    db.settings.main={...DEFAULTS};this.save(db)},
+  save(db){store.set(JSON.stringify(db))},
+  async reset(){store.clear();await this.seed();this.pull()},
+  /* auth */
+  prof(id,u){return{uid:id,email:u.email,name:u.name,phone:u.phone||'',role:u.role,thId:u.thId||null}},
+  async signIn(em,pw){const db=this.load(),e=Object.entries(db.users).find(([,u])=>u.email===em);
+    if(!e||await sha(e[1].salt+pw)!==e[1].hash)throw new Error('badlogin');ss.set('jb.s',e[0]);return this.prof(e[0],e[1])},
+  async signUp(p,pw){return this._make(p,pw,true)},
+  async createAccount(p,pw){return this._make(p,pw,false)},
+  async _make(p,pw,login){
+    const db=this.load();if(Object.values(db.users).some(u=>u.email===p.email))throw new Error('exists');
+    const id=uid(),salt=uid();db.users[id]={email:p.email,name:p.name,phone:p.phone||'',role:p.role||'client',salt,hash:await sha(salt+pw),...(p.thId?{thId:p.thId}:{})};
+    this.save(db);this.pull(true);if(login)ss.set('jb.s',id);this.cb();return this.prof(id,db.users[id])},
+  async restore(){const id=ss.get('jb.s'),db=this.load(),u=id&&db&&db.users[id];return u?this.prof(id,u):null},
+  async signOut(){ss.del('jb.s')},
+  async startSync(){this.pull(true)},
+  /* data */
+  async txn(fn){
+    const run=async()=>{const db=this.load();
+      const t={get:(c,id)=>db[c][id]?JSON.parse(JSON.stringify(db[c][id])):null,set:(c,id,o)=>{db[c][id]=JSON.parse(JSON.stringify(o))},del:(c,id)=>{delete db[c][id]}};
+      const r=await fn(t);this.save(db);return r};                       // nothing is saved if fn throws
+    const out=navigator.locks?await navigator.locks.request('jb-db',run):await run();this.pull();return out},
+  async set(c,id,o){return this.txn(t=>t.set(c,id,o))},
+  async update(c,id,p){return this.txn(async t=>{const o=await t.get(c,id);t.set(c,id,{...o,...p})})},
+  async del(c,id){return this.txn(t=>t.del(c,id))},
+  async uploadProof(owner,apptId,shrunk){return shrunk.url},
+  async exportAll(){return this.load()},
+  async importAll(o){COLS.forEach(c=>{if(typeof o[c]!=='object'||!o[c])throw new Error('badbackup')});this.save(o);this.pull()}
+};
+
+/* =====================================================================
+   DATABASE ADAPTER 2: FIREBASE (Auth + Cloud Firestore + Cloud Storage)
+   Loaded only when FIREBASE_CONFIG is filled in.
+   ===================================================================== */
+async function makeFirebase(cfg){
+  const base='https://www.gstatic.com/firebasejs/10.14.1/firebase-';
+  const [A,Au,F,St]=await Promise.all(['app','auth','firestore','storage'].map(n=>import(base+n+'.js')));
+  const app=A.initializeApp(cfg),auth=Au.getAuth(app),fs=F.getFirestore(app),st=St.getStorage(app);
+  const clean=o=>JSON.parse(JSON.stringify(o));
+  let unsubs=[];const stop=()=>{unsubs.forEach(u=>u());unsubs=[]};
+  const readProfile=async u=>{const s=await F.getDoc(F.doc(fs,'users',u.uid));return s.exists()?{uid:u.uid,email:u.email,...s.data()}:null};
+  const self={
+    mode:'firebase',cb:()=>{},on(fn){this.cb=fn},async init(){},
+    async restore(){const u=await new Promise(r=>{const un=Au.onAuthStateChanged(auth,x=>{un();r(x)})});if(!u)return null;
+      const p=await readProfile(u);if(!p)await Au.signOut(auth);return p},
+    async signIn(em,pw){const c=await Au.signInWithEmailAndPassword(auth,em,pw);const p=await readProfile(c.user);
+      if(!p){await Au.signOut(auth);throw new Error('noprofile')}return p},
+    async signUp(p,pw){const c=await Au.createUserWithEmailAndPassword(auth,p.email,pw);
+      const d={email:p.email,name:p.name,phone:p.phone||'',role:'client'};await F.setDoc(F.doc(fs,'users',c.user.uid),d);return{uid:c.user.uid,...d}},
+    async createAccount(p,pw){                                           // admin makes staff/therapist logins without being signed out
+      const a2=A.initializeApp(cfg,'sec'+Date.now()),au2=Au.getAuth(a2);
+      const c=await Au.createUserWithEmailAndPassword(au2,p.email,pw);await Au.signOut(au2);
+      await F.setDoc(F.doc(fs,'users',c.user.uid),clean({email:p.email,name:p.name,phone:'',role:p.role,thId:p.thId||null}));return c.user.uid},
+    async signOut(){stop();await Au.signOut(auth)},
+    startSync(p){
+      stop();const emit=()=>self.cb(),C=n=>F.collection(fs,n);
+      const L=(q,fn)=>unsubs.push(F.onSnapshot(q,fn,e=>{console.error(e);toast('Sync problem: '+(e.code||e.message))}));
+      const list=(name,sort)=>s=>{D[name]=s.docs.map(d=>({id:d.id,...d.data()}));if(sort)D[name].sort(sort);emit()};
+      L(C('services'),list('services'));L(C('therapists'),list('therapists'));
+      L(F.query(C('slots'),F.where('date','>=',dkey(new Date()))),s=>{const m={};s.docs.forEach(d=>m[d.id]=d.data());D.slots=m;emit()});
+      L(F.doc(fs,'settings','main'),s=>{D.settings={...DEFAULTS,...(s.data()||{})};emit()});
+      const ap=p.role==='client'?F.query(C('appointments'),F.where('cid','==',p.uid)):p.role==='therapist'?F.query(C('appointments'),F.where('th','==',p.thId)):C('appointments');
+      L(ap,list('appointments'));
+      if(p.role==='client')L(F.query(C('notes'),F.where('to','==',p.uid)),list('notes',(a,b)=>b.t-a.t));
+      if(p.role==='admin'){L(C('log'),list('log',(a,b)=>b.at-a.at));L(C('users'),list('users'))}
+    },
+    async txn(fn){return F.runTransaction(fs,tx=>fn({
+      get:async(c,id)=>{const s=await tx.get(F.doc(fs,c,id));return s.exists()?s.data():null},      // all reads must come before writes
+      set:(c,id,o)=>tx.set(F.doc(fs,c,id),clean(o)),del:(c,id)=>tx.delete(F.doc(fs,c,id))}))},
+    async set(c,id,o){await F.setDoc(F.doc(fs,c,id),clean(o))},
+    async update(c,id,p){await F.updateDoc(F.doc(fs,c,id),clean(p))},
+    async del(c,id){await F.deleteDoc(F.doc(fs,c,id))},
+    async uploadProof(owner,apptId,shrunk){const r=St.ref(st,`proofs/${owner}/${apptId}/${Date.now()}.jpg`);
+      await St.uploadBytes(r,shrunk.blob,{contentType:'image/jpeg'});return St.getDownloadURL(r)},
+    async exportAll(){const out={};for(const c of['services','therapists','appointments','users','log','settings','slots']){
+      const s=await F.getDocs(F.collection(fs,c));out[c]={};s.docs.forEach(d=>out[c][d.id]=d.data())}return out},
+    async importAll(){throw new Error('Restore is only available in demo mode. Use the Firebase console to import data.')}
+  };
+  return self}
+
+/* =====================================================================
+   APP
+   ===================================================================== */
+let tt;function toast(m){const e=$('#toast');e.textContent=m;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),3000)}
+function showImg(src){const l=$('#lightbox');l.querySelector('img').src=src;l.classList.add('on')}
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
+function fail(e){console.error(e);const m=String(e&&(e.message||e.code)||e);
+  if(m==='taken'){toast('That slot was just taken. Availability is refreshed.');S.sel.time=null;S.walk.time=null}
+  else if(m==='stale')toast('That booking changed while you were working. Please try again.');
+  else if(/permission/i.test(m))toast('Not allowed. Check your Firestore security rules.');
+  else if(m==='notimage')toast('Please attach an image (a screenshot or photo).');
+  else toast('Something went wrong: '+m)}
+const run=fn=>async(...a)=>{if(S.busy)return;S.busy=true;try{await fn(...a)}catch(e){fail(e)}finally{S.busy=false;render()}};
+const can=r=>S.user&&r.includes(S.user.role);
+const setMode=m=>{S.mode=m;S.reg=false;render()};
+const setReg=v=>{S.reg=v;render()};
+
+/* ---- auth ---- */
+const signUp=run(async()=>{
+  const name=$('#an').value.trim(),ph=$('#ap').value.trim(),em=$('#ae').value.trim().toLowerCase(),pw=$('#aw').value;
+  if(!name||!ph||!em||!pw)return toast('Fill in every field to create your account.');
+  if(!/^\S+@\S+\.\S+$/.test(em))return toast('Enter a valid email address.');
+  if(!/^(09|\+639)\d{9}$/.test(ph.replace(/[\s-]/g,'')))return toast('Enter a Philippine mobile number, like 0917 123 4567.');
+  if(pw.length<6)return toast('Use a password of at least 6 characters.');
+  try{S.user=await DB.signUp({email:em,name,phone:ph},pw)}
+  catch(e){if(e.message==='exists'||e.code==='auth/email-already-in-use')return toast('That email already has an account. Log in instead.');throw e}
+  await DB.startSync(S.user);toast('Account created. Welcome, '+name.split(' ')[0]+'.')});
+const logIn=run(async()=>{
+  const em=$('#le').value.trim().toLowerCase(),pw=$('#lw').value;let u;
+  try{u=await DB.signIn(em,pw)}catch(e){return toast(e.message==='noprofile'?'This login has no JendellBook profile yet. Ask the owner to finish setting it up.':'Wrong email or password. Check both and try again.')}
+  if((S.mode==='client')!==(u.role==='client')){await DB.signOut();return toast(S.mode==='client'?'That is a staff account. Switch to Staff to log in.':'That is a client account. Switch to Client to log in.')}
+  S.user=u;S.thView=u.thId||null;await DB.startSync(u);toast('Logged in.')});
+const logOut=run(async()=>{await DB.signOut();S.user=null;S.mode='client';S.reg=false;S.resch=null;
+  Object.assign(D,{appointments:[],notes:[],log:[],users:[]});toast('You’re logged out.')});
+const ent=f=>`onkeydown="if(event.key==='Enter')${f}()"`;
+function auth(){
+  const c=S.mode==='client',demo=DB.mode==='local';
+  const login=`<label for="le">Email</label><input type="email" id="le" autocomplete="username" ${ent('logIn')}>
+   <label for="lw">Password</label><input type="password" id="lw" autocomplete="current-password" ${ent('logIn')}>
+   <div class="tools" style="margin-top:16px"><button class="btn" onclick="logIn()">Log in</button></div>
+   ${c?'<p class="note">New here? <button class="link" onclick="setReg(true)">Create an account</button></p>'+(demo?'<p class="note">Sample login: demo@client.ph / client123</p>':''):(demo?'<p class="note">Demo logins: staff@jendell.ph / staff123 · marites@jendell.ph / therapist123 · admin@jendell.ph / admin123</p>':'<p class="note">Staff accounts are created by the owner.</p>')}`;
+  const signup=`<label for="an">Full name</label><input type="text" id="an" autocomplete="name">
+   <label for="ap">Mobile number</label><input type="tel" id="ap" autocomplete="tel" placeholder="09XX XXX XXXX, for SMS updates">
+   <label for="ae">Email</label><input type="email" id="ae" autocomplete="email">
+   <label for="aw">Password</label><input type="password" id="aw" autocomplete="new-password" ${ent('signUp')}>
+   <div class="tools" style="margin-top:16px"><button class="btn" onclick="signUp()">Create account</button></div>
+   <p class="note">Already registered? <button class="link" onclick="setReg(false)">Log in</button></p>`;
+  return `<div class="auth"><h1>${c?(S.reg?'Create your account':'Book your massage online'):'Staff sign in'}</h1>
+   <p class="lead">${c?'Reserve a therapist and time slot at JENDELL Massage and Spa.':'For the front desk, therapists, and the owner.'}</p>
+   <section class="panel"><div class="seg" role="group" aria-label="Account type"><button aria-pressed="${c}" onclick="setMode('client')">Client</button><button aria-pressed="${!c}" onclick="setMode('staff')">Staff</button></div>
+   ${c&&S.reg?signup:login}</section></div>`}
+
+/* ---- client actions ---- */
+function pick(k,v){S.sel[k]=v;if(k==='svc'||k==='th'||k==='day')S.sel.time=null;render()}
+const book=run(async()=>{
+  const s=S.sel,sv=svc(s.svc);if(!s.time)return toast('Choose a time slot first.');
+  if(S.race&&DB.mode==='local'){S.race=false;await rival(s)}                       // test helper: another client grabs the slot first
+  const ids=needed(s.th,s.day,s.time,sv.mins);if(!ids)throw new Error('taken');
+  if(S.resch){
+    const id=S.resch;
+    await DB.txn(async t=>{
+      const a=await t.get('appointments',id);if(!a)throw new Error('stale');
+      const cur=await Promise.all(ids.map(i=>t.get('slots',i)));
+      if(cur.some((l,k)=>slotLive(l)&&l.apptId!==id))throw new Error('taken');
+      const olds=await Promise.all((a.slots||[]).map(async i=>[i,await t.get('slots',i)]));                // reads first…
+      olds.forEach(([i,l])=>{if(l&&l.apptId===id&&!ids.includes(i))t.del('slots',i)});                      // …then writes
+      const hold=['Confirmed','Completed'].includes(a.status)?null:a.holdUntil;
+      ids.forEach(i=>t.set('slots',i,lockDoc({id,th:s.th,date:s.day},hold)));
+      t.set('appointments',id,{...a,svc:s.svc,th:s.th,date:s.day,time:s.time,slots:ids});
+      if(a.cid)t.set('notes',uid(),note(a.cid,'Your booking was moved to '+dayLabel(s.day)+' at '+s.time+'.',a.ph));
+    });
+    S.resch=null;S.sel.time=null;return toast('Booking rescheduled.')}
+  const id=uid(),hold=Date.now()+D.settings.holdMin*60000;
+  await DB.txn(async t=>{
+    const cur=await Promise.all(ids.map(i=>t.get('slots',i)));                                              // read every slot…
+    if(cur.some(slotLive))throw new Error('taken');                                                         // …all-or-nothing check…
+    ids.forEach(i=>t.set('slots',i,lockDoc({id,th:s.th,date:s.day},hold)));                                // …then lock them all
+    t.set('appointments',id,{who:S.user.name,cid:S.user.uid,ph:S.user.phone||'',svc:s.svc,th:s.th,date:s.day,time:s.time,slots:ids,status:'Pending Payment',holdUntil:hold,proofs:[],created:Date.now()});
+  });
+  S.sel.time=null;toast('Slot held for '+D.settings.holdMin+' minutes. Submit your GCash proof to continue.')});
+async function rival(s){const ids=needed(s.th,s.day,s.time,svc(s.svc).mins),rid=uid(),h=Date.now()+60000;
+  await DB.txn(async t=>{ids.forEach(i=>t.set('slots',i,{apptId:rid,th:s.th,date:s.day,holdUntil:h}));
+    t.set('appointments',rid,{who:'Another client',cid:null,ph:'',svc:s.svc,th:s.th,date:s.day,time:s.time,slots:ids,status:'Pending Payment',holdUntil:h,proofs:[],created:Date.now()})})}
+const sendProof=run(async id=>{
+  const ref=$('#ref'+id).value.trim(),f=$('#file'+id).files[0];
+  if(!ref||!f)return toast('Enter the GCash reference number and attach a screenshot.');
+  if(!/^[A-Za-z0-9-]{6,30}$/.test(ref))return toast('The reference number should be 6 to 30 letters or digits.');
+  const sh=await shrink(f),a0=D.appointments.find(x=>x.id===id);
+  const url=await DB.uploadProof(S.user.uid,id,sh);
+  await DB.txn(async t=>{
+    const a=await t.get('appointments',id);if(!a||a.status!=='Pending Payment'||(a.holdUntil&&a.holdUntil<Date.now()))throw new Error('stale');
+    const cur=await Promise.all((a.slots||[]).map(async i=>[i,await t.get('slots',i)]));
+    if(cur.some(([,l])=>!l||l.apptId!==id))throw new Error('stale');
+    const vb=D.settings.verifyH>0?Date.now()+D.settings.verifyH*3600000:null;     // client's timer stops; optional staff limit starts
+    cur.forEach(([i])=>t.set('slots',i,lockDoc({id,th:a.th,date:a.date},vb)));
+    t.set('appointments',id,{...a,status:'Pending Verification',holdUntil:vb,proofs:[...(a.proofs||[]),{ref,file:f.name,url,st:'Pending',at:Date.now()}]});
+  });
+  toast('Proof sent. Staff have been notified.')});
+function resch(id){const a=D.appointments.find(x=>x.id===id);S.resch=id;S.sel={svc:a.svc,th:a.th,day:a.date,time:null};render();scrollTo(0,0)}
+const cancelResch=()=>{S.resch=null;render()};
+async function release(t,id,newStatus,by){                    // shared: set status and free this booking's slot locks (reads first)
+  const a=await t.get('appointments',id);if(!a)throw new Error('stale');
+  const cur=await Promise.all((a.slots||[]).map(async i=>[i,await t.get('slots',i)]));
+  cur.forEach(([i,l])=>{if(l&&l.apptId===id)t.del('slots',i)});
+  t.set('appointments',id,{...a,status:newStatus,holdUntil:null});return a}
+function canChange(a){return can(['staff','admin'])||a.status==='Pending Payment'||startMs(a.date,a.time)-Date.now()>=D.settings.cutoffH*3600000}
+const cancelAppt=run(async id=>{
+  const a0=D.appointments.find(x=>x.id===id);if(a0&&!canChange(a0))return toast('Changes close '+D.settings.cutoffH+' hours before the appointment. Please call the spa.');
+  await DB.txn(async t=>{const a=await release(t,id,'Cancelled');
+    if(a.cid)t.set('notes',uid(),note(a.cid,'Your booking on '+dayLabel(a.date)+' at '+a.time+' was cancelled.',a.ph));
+    if(S.user.role!=='client')t.set('log',uid(),logDoc('Cancelled booking #'+id.slice(-4)))});
+  toast('Booking cancelled.')});
+const expire=async id=>{                                         // a held slot ran out of time: free it
+  try{await DB.txn(async t=>{const a=await t.get('appointments',id);
+      if(!a||!['Pending Payment','Pending Verification'].includes(a.status)||!a.holdUntil||a.holdUntil>Date.now())return;
+      await release(t,id,'Cancelled');
+      if(a.cid)t.set('notes',uid(),note(a.cid,'Your held slot on '+dayLabel(a.date)+' at '+a.time+' was released because no payment proof was verified in time.',a.ph))});
+    toast('A held slot expired and was released.')}
+  catch(e){console.error(e);setTimeout(()=>S.exp.delete(id),15000)}};
+
+/* ---- staff / therapist / admin actions ---- */
+const decide=run(async(id,ok)=>{
+  const a0=D.appointments.find(x=>x.id===id),p0=a0.proofs[a0.proofs.length-1];
+  if(ok&&D.appointments.some(o=>o.id!==id&&(o.proofs||[]).some(q=>q.ref===p0.ref&&q.st==='Verified')))return toast('This reference number was already verified for another booking.');
+  await DB.txn(async t=>{
+    const a=await t.get('appointments',id);if(!a||a.status!=='Pending Verification'||(a.holdUntil&&a.holdUntil<Date.now()))throw new Error('stale');
+    const proofs=[...a.proofs],p=proofs[proofs.length-1];p.st=ok?'Verified':'Rejected';p.by=S.user.name;p.decidedAt=Date.now();
+    const cur=await Promise.all((a.slots||[]).map(async i=>[i,await t.get('slots',i)]));
+    if(ok){
+      cur.forEach(([i,l])=>{if(l&&l.apptId===id)t.set('slots',i,lockDoc({id,th:a.th,date:a.date},null))});
+      t.set('appointments',id,{...a,proofs,status:'Confirmed',holdUntil:null});
+      if(a.cid)t.set('notes',uid(),note(a.cid,'Your booking on '+dayLabel(a.date)+' at '+a.time+' is confirmed.',a.ph));
+      t.set('log',uid(),logDoc('Verified payment proof for booking #'+id.slice(-4)+' (ref '+p.ref+')'));
+    }else{
+      const hold=Date.now()+D.settings.holdMin*60000;                                                   // client gets a fresh window to resubmit
+      cur.forEach(([i,l])=>{if(l&&l.apptId===id)t.set('slots',i,lockDoc({id,th:a.th,date:a.date},hold))});
+      t.set('appointments',id,{...a,proofs,status:'Pending Payment',holdUntil:hold});
+      if(a.cid)t.set('notes',uid(),note(a.cid,'Your payment proof was rejected. Send a clear screenshot and the correct reference number within the time shown.',a.ph));
+      t.set('log',uid(),logDoc('Rejected payment proof for booking #'+id.slice(-4)));
+    }});
+  toast(ok?'Verified. Booking confirmed.':'Rejected. The client gets a new hold window to resubmit.')});
+const complete=run(async id=>{await DB.txn(async t=>{
+  const a=await t.get('appointments',id);if(!a||a.status!=='Confirmed')throw new Error('stale');
+  t.set('appointments',id,{...a,status:'Completed'});
+  if(a.cid)t.set('notes',uid(),note(a.cid,'Thanks for visiting JENDELL. We hope to see you again.',a.ph));
+  t.set('log',uid(),logDoc('Marked booking #'+id.slice(-4)+' completed'))})});
+const remind=run(async id=>{const a=D.appointments.find(x=>x.id===id);
+  await DB.set('notes',uid(),note(a.cid,'Reminder: '+svc(a.svc).name+' with '+thr(a.th).name+' on '+dayLabel(a.date)+' at '+a.time+'.',a.ph));
+  await DB.set('log',uid(),logDoc('Sent SMS reminder for booking #'+id.slice(-4)));toast('SMS reminder sent.')});
+function wpick(k,v){S.walk.name=$('#wn').value;S.walk[k]=v;if(k!=='time'&&k!=='name')S.walk.time=null;render()}
+const walkIn=run(async()=>{
+  const n=$('#wn').value.trim(),w=S.walk;S.walk.name=n;
+  if(!n)return toast('Enter the client’s name.');if(!w.time)return toast('Choose a time slot.');
+  const ids=needed(w.th,w.day,w.time,svc(w.svc).mins);if(!ids)throw new Error('taken');const id=uid();
+  await DB.txn(async t=>{
+    const cur=await Promise.all(ids.map(i=>t.get('slots',i)));if(cur.some(slotLive))throw new Error('taken');
+    ids.forEach(i=>t.set('slots',i,lockDoc({id,th:w.th,date:w.day},null)));
+    t.set('appointments',id,{who:n,cid:null,ph:'',svc:w.svc,th:w.th,date:w.day,time:w.time,slots:ids,status:'Confirmed',holdUntil:null,proofs:[],created:Date.now()});
+    t.set('log',uid(),logDoc('Entered walk-in booking for '+n))});
+  w.time=null;w.name='';toast('Walk-in booking saved and confirmed.')});
+const addSvc=run(async()=>{const n=$('#sn').value.trim(),m=+$('#sm').value,p=+$('#sp').value;
+  if(!n||!(m>0)||!(p>0))return toast('Fill in name, minutes, and price.');
+  await DB.set('services',uid(),{name:n,mins:m,price:p,on:true});await DB.set('log',uid(),logDoc('Added service: '+n))});
+const flipSvc=run(async id=>{const s=svc(id);await DB.update('services',id,{on:s.on===false});await DB.set('log',uid(),logDoc((s.on===false?'Activated ':'Deactivated ')+s.name))});
+const addTh=run(async()=>{const n=$('#tn').value.trim(),sp=$('#ts').value.trim();if(!n)return toast('Enter the therapist’s name.');
+  await DB.set('therapists',uid(),{name:n,spec:sp,on:true});await DB.set('log',uid(),logDoc('Added therapist: '+n))});
+const flip=run(async id=>{const t=thr(id);await DB.update('therapists',id,{on:!t.on});await DB.set('log',uid(),logDoc((t.on?'Deactivated ':'Activated ')+t.name))});
+const saveSettings=run(async()=>{const h=+$('#hm').value,c=+$('#co').value,v=+$('#vh').value;if(!(h>=5&&h<=120)||!(c>=0&&c<=72)||!(v>=0&&v<=24))return toast('Hold time must be 5 to 120 minutes, the cutoff 0 to 72 hours, and the staff limit 0 to 24 hours.');
+  await DB.set('settings','main',{holdMin:h,cutoffH:c,verifyH:v});await DB.set('log',uid(),logDoc('Policy changed: hold '+h+' min, cancellation cutoff '+c+' h, staff limit '+v+' h'));toast('Policy saved.')});
+const addStaff=run(async()=>{const n=$('#sn2').value.trim(),e=$('#se').value.trim().toLowerCase(),pw=$('#sw').value,r=$('#sr').value;
+  if(!n||!/^\S+@\S+\.\S+$/.test(e)||pw.length<6)return toast('Enter a name, a valid email, and a password of at least 6 characters.');
+  if(r==='therapist'&&!$('#st').value)return toast('Add a therapist profile first.');
+  try{await DB.createAccount({email:e,name:n,role:r,thId:r==='therapist'?$('#st').value:null},pw)}
+  catch(x){if(x.message==='exists'||x.code==='auth/email-already-in-use')return toast('That email already has an account.');throw x}
+  await DB.set('log',uid(),logDoc('Created '+r+' account for '+n));toast('Account created. They can log in from the Staff tab.')});
+const delAcc=run(async id=>{const u=D.users.find(x=>x.id===id);await DB.del('users',id);await DB.set('log',uid(),logDoc('Removed account '+(u?u.email:id)))});
+const loadSample=run(async()=>{
+  const sv=[['Swedish massage',60,700],['Deep tissue massage',60,850],['Hot stone therapy',90,1200]],th=[['Marites','Swedish, aromatherapy'],['Joyce','Deep tissue, sports'],['Lorna','Hot stone']];
+  for(const[n,m,p]of sv)await DB.set('services',uid(),{name:n,mins:m,price:p,on:true});
+  for(const[n,s]of th)await DB.set('therapists',uid(),{name:n,spec:s,on:true});
+  await DB.set('settings','main',{...DEFAULTS});toast('Sample services and therapists added.')});
+const backup=run(async()=>{download('jendellbook-backup-'+dkey(new Date())+'.json',JSON.stringify(await DB.exportAll(),null,1),'application/json');toast('Backup downloaded.')});
+const restoreFile=run(async el=>{const f=el.files[0];if(!f)return;if(!confirm('Replace ALL current data with this backup?'))return;
+  await DB.importAll(JSON.parse(await f.text()));S.user=null;toast('Backup restored. Please log in again.')});
+const resetDemo=run(async()=>{if(!confirm('Erase everything saved in this browser and restore the sample data?'))return;await Local.reset();S.user=null;S.mode='client';toast('Demo data reset.')});
+function csv(){const safe=c=>{c=String(c??'');return '"'+(/^[=+\-@]/.test(c)?"'"+c:c).replace(/"/g,'""')+'"'};
+  const rows=[['Booking','Client','Service','Therapist','Date','Time','Status','Payment proofs']];
+  D.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).forEach(a=>rows.push([a.id,a.who,svc(a.svc).name,thr(a.th).name,a.date,a.time,a.status,(a.proofs||[]).map(p=>p.ref+':'+p.st).join(' | ')]));
+  download('jendellbook-bookings-'+dkey(new Date())+'.csv',rows.map(r=>r.map(safe).join(',')).join('\n'),'text/csv')}
+
+/* ---- timer: release held slots whose time ran out, update countdowns ---- */
+function tick(){
+  if(S.user&&S.ready&&S.user.role!=='therapist'){
+    D.appointments.forEach(a=>{if(['Pending Payment','Pending Verification'].includes(a.status)&&a.holdUntil&&Date.now()>a.holdUntil&&!S.exp.has(a.id)&&(S.user.role!=='client'||a.cid===S.user.uid)){S.exp.add(a.id);expire(a.id)}})}
+  document.querySelectorAll('[data-hold]').forEach(e=>{const s=Math.max(0,Math.floor((+e.dataset.hold-Date.now())/1000));e.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')})}
+setInterval(tick,1000);
+
+/* ---- views ---- */
+function chipsDay(cur,fn){return days().map(d=>`<button class="chip" aria-pressed="${d.key===cur}" onclick="${fn}('day','${d.key}')">${d.label}</button>`).join('')}
+function chipsTime(th,day,cur,m,fn,mine){return TIMES.map(t=>`<button class="chip" aria-pressed="${t===cur}" ${free(th,day,t,m,mine)?'':'disabled'} onclick="${fn}('time','${t}')">${t}</button>`).join('')}
+function client(){
+  const s=S.sel,ths=D.therapists.filter(t=>t.on),sv=D.services.filter(x=>x.on!==false),mine=D.appointments.filter(a=>a.cid===S.user.uid).sort((a,b)=>b.created-a.created);
+  if(!s.day||!days().some(d=>d.key===s.day))s.day=days()[0].key;
+  if(!sv.find(x=>x.id===s.svc))s.svc=sv[0]&&sv[0].id;if(!ths.find(t=>t.id===s.th))s.th=ths[0]&&ths[0].id;
+  const m=svc(s.svc).mins,ready=sv.length&&ths.length;
+  const form=!ready?'<p class="empty">The spa has not published its services and therapists yet. Please check back soon.</p>':`
+   <label for="svc">Service</label><select id="svc" onchange="pick('svc',this.value)">${sv.map(x=>`<option value="${x.id}" ${x.id===s.svc?'selected':''}>${esc(x.name)} · ${x.mins} min · ₱${x.price}</option>`).join('')}</select>
+   <label for="th">Therapist</label><select id="th" onchange="pick('th',this.value)">${ths.map(x=>`<option value="${x.id}" ${x.id===s.th?'selected':''}>${esc(x.name)} (${esc(x.spec)})</option>`).join('')}</select>
+   <label>Day</label><div class="chips">${chipsDay(s.day,'pick')}</div>
+   <label>Time</label><div class="chips">${chipsTime(s.th,s.day,s.time,m,'pick',S.resch)}</div>
+   <p class="note">Struck-through times are already booked or have passed.${m>60?' This service takes '+m+' minutes, so it needs '+Math.ceil(m/60)+' free hours in a row.':''}</p>
+   <div class="tools"><button class="btn" onclick="book()">${S.resch?'Move booking':'Hold this slot'}</button>${S.resch?'<button class="btn ghost" onclick="cancelResch()">Keep original time</button>':''}</div>
+   ${DB.mode==='local'?`<label style="font-weight:400"><input type="checkbox" ${S.race?'checked':''} onchange="S.race=this.checked"> Test the conflict check: let another client grab the chosen slot first</label>`:''}`;
+  return `<h1>Hi, ${esc(S.user.name.split(' ')[0])}. Book a massage</h1><p class="lead">Pick a service, therapist, and time. Your slot is held for ${D.settings.holdMin} minutes while you send the ₱100 reservation fee through GCash. Once your proof is in, the timer stops until staff verify it.</p>
+  <div class="grid"><section class="panel"><h2>${S.resch?'Reschedule booking':'New booking'}</h2>${form}</section>
+  <section class="panel"><h2>My bookings</h2>${mine.length?mine.map(a=>{const lp=(a.proofs||[])[(a.proofs||[]).length-1];return `<div class="row"><div style="flex:1;min-width:0"><b>${esc(svc(a.svc).name)}</b><p>${esc(thr(a.th).name)} · ${dayLabel(a.date)} · ${a.time}</p>
+   ${a.status==='Pending Payment'?`<div class="proof"><b>Send your ₱100 reservation fee</b><p>Send ₱100 to JENDELL’s GCash (sample number: 0917 000 1234), then enter the reference number from your receipt. The screenshot should show the amount and reference number.</p><p class="hold">Slot held for <span data-hold="${a.holdUntil}"></span></p>${lp&&lp.st==='Rejected'?`<p class="tag">Your last proof (${esc(lp.ref)}) was rejected. Send a corrected one.</p>`:''}
+     <label for="ref${a.id}">GCash reference number</label><input type="text" id="ref${a.id}" inputmode="text" autocomplete="off">
+     <label for="file${a.id}">Screenshot of payment</label><input type="file" id="file${a.id}" accept="image/*">
+     <div class="tools"><button class="btn sm" onclick="sendProof('${a.id}')">Send proof</button><button class="btn sm ghost" onclick="cancelAppt('${a.id}')">Cancel</button></div></div>`:''}
+   ${a.status==='Pending Verification'?`<p>Waiting for staff to verify your payment. Your slot stays reserved.${a.holdUntil?` <span class="hold">Time left: <span data-hold="${a.holdUntil}"></span></span>`:''}</p>`:''}${(a.proofs||[]).length?`<p>Proofs sent: ${a.proofs.map(q=>esc(q.ref)+' ('+q.st+')').join(', ')}</p>`:''}
+   ${['Pending Verification','Confirmed'].includes(a.status)?(canChange(a)?`<div class="tools"><button class="btn sm ghost" onclick="resch('${a.id}')">Reschedule</button><button class="btn sm ghost" onclick="cancelAppt('${a.id}')">Cancel</button></div>`:`<p class="note">Changes close ${D.settings.cutoffH} hours before the appointment. Please call the spa.</p>`):''}</div>${pill(a.status)}</div>`}).join(''):'<p class="empty">No bookings yet. Choose a slot on the left to start.</p>'}</section></div>
+  <section class="panel gap"><h2>SMS notifications</h2><p class="empty">Texts are sent to ${esc(S.user.phone||'your mobile number')}.</p>${D.notes.length?D.notes.filter(x=>x.to===S.user.uid).map(x=>`<div class="row"><div>${esc(x.m)}<p>SMS to ${esc(x.ph||'—')} · ${fmt(x.t)} · ${x.m.length}/160 characters</p></div></div>`).join(''):'<p class="empty">Confirmations, rejections, and reminders arrive as text messages and appear here too.</p>'}</section>`}
+
+function walkPanel(){
+  const w=S.walk,sv=D.services.filter(x=>x.on!==false),ths=D.therapists.filter(t=>t.on);
+  if(!w.day||!days().some(d=>d.key===w.day))w.day=days()[0].key;
+  if(!sv.find(x=>x.id===w.svc))w.svc=sv[0]&&sv[0].id;if(!ths.find(t=>t.id===w.th))w.th=ths[0]&&ths[0].id;
+  if(!sv.length||!ths.length)return `<section class="panel gap"><h2>Walk-in or phone booking</h2><p class="empty">Add at least one service and one therapist (Admin tab) first.</p></section>`;
+  const m=svc(w.svc).mins;
+  return `<section class="panel gap"><h2>Walk-in or phone booking</h2><p class="empty">Enter a booking for someone who called or walked in. It is confirmed right away.</p>
+   <label for="wn">Client name</label><input type="text" id="wn" value="${esc(w.name||'')}">
+   <label for="ws">Service</label><select id="ws" onchange="wpick('svc',this.value)">${sv.map(x=>`<option value="${x.id}" ${x.id===w.svc?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
+   <label for="wt">Therapist</label><select id="wt" onchange="wpick('th',this.value)">${ths.map(x=>`<option value="${x.id}" ${x.id===w.th?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
+   <label>Day</label><div class="chips">${chipsDay(w.day,'wpick')}</div>
+   <label>Time</label><div class="chips">${chipsTime(w.th,w.day,w.time,m,'wpick')}</div>
+   <div class="tools" style="margin-top:14px"><button class="btn" onclick="walkIn()">Save booking</button></div></section>`}
+function reportPanel(){
+  const live=D.appointments.filter(a=>LIVE.includes(a.status));
+  const by=(l,f)=>l.map(x=>({n:x.name,c:live.filter(a=>a[f]===x.id).length}));
+  const bars=r=>{const m=Math.max(1,...r.map(x=>x.c));return '<table>'+r.map(x=>`<tr><td>${esc(x.n)}</td><td style="width:50%"><div class="bar" style="width:${x.c/m*100}%"></div></td><td>${x.c}</td></tr>`).join('')+'</table>'};
+  return `<section class="panel gap"><h2>Reports</h2><p class="empty">${live.length} active bookings, ${D.appointments.filter(a=>a.status==='Completed').length} completed, ${D.appointments.filter(a=>a.status==='Cancelled').length} cancelled.</p>
+   <h3>Appointment volume by day</h3>${bars(days().map(d=>({n:d.label,c:live.filter(a=>a.date===d.key).length})))}
+   <h3>Service demand</h3>${bars(by(D.services,'svc'))}<h3>Therapist workload</h3>${bars(by(D.therapists,'th'))}
+   <div class="tools" style="margin-top:14px"><button class="btn sm ghost" onclick="csv()">Export bookings (CSV)</button></div></section>`}
+function staff(){
+  const q=D.appointments.filter(a=>a.status==='Pending Verification');
+  const all=D.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  return `<h1>Front desk</h1><p class="lead">Check each submitted reference number and screenshot against the spa’s GCash history, then verify or reject.</p>
+  <section class="panel"><h2>Payment verification queue</h2>${q.length?q.map(a=>{const p=a.proofs[a.proofs.length-1];return `<div class="row"><div><b>${esc(a.who)}</b> · ${esc(svc(a.svc).name)}<p>${esc(thr(a.th).name)} · ${dayLabel(a.date)} · ${a.time}</p><p>Reference: <b>${esc(p.ref)}</b> · Sent ${p.at?fmt(p.at):''}</p>${a.holdUntil?`<p class="hold">Slot is released in: <span data-hold="${a.holdUntil}"></span></p>`:''}${p.url?`<img class="thumb" alt="Payment screenshot from ${esc(a.who)}" src="${esc(p.url)}" onclick="showImg(this.src)">`:`<p>Screenshot: ${esc(p.file)}</p>`}</div>
+   <div class="tools"><button class="btn sm" onclick="decide('${a.id}',true)">Verify</button><button class="btn sm bad" onclick="decide('${a.id}',false)">Reject</button></div></div>`}).join(''):'<p class="empty">Nothing to verify. New proofs appear here when a client sends one.</p>'}</section>
+  <section class="panel gap"><h2>Schedule across all therapists</h2><div class="scroll"><table><tr><th>When</th><th>Therapist</th><th>Client</th><th>Service</th><th>Status</th></tr>
+   ${all.map(a=>`<tr><td>${dayLabel(a.date)} ${a.time}</td><td>${esc(thr(a.th).name)}</td><td>${esc(a.who)}</td><td>${esc(svc(a.svc).name)}</td><td>${pill(a.status)}${a.status==='Confirmed'&&a.cid?` <button class="btn sm ghost" onclick="remind('${a.id}')">Send SMS reminder</button>`:''}${['Pending Payment','Pending Verification','Confirmed'].includes(a.status)?` <button class="btn sm ghost" onclick="cancelAppt('${a.id}')">Cancel</button>`:''}</td></tr>`).join('')}</table></div></section>`+walkPanel()+reportPanel()}
+function therapist(){
+  const me=thr(S.thView),mine=D.appointments.filter(a=>a.th===S.thView&&['Confirmed','Completed'].includes(a.status)).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  return `<h1>My schedule</h1><p class="lead">Therapists see only their own confirmed appointments.</p>
+  <section class="panel"><b>${esc(me.name)}</b><p class="empty">${esc(me.spec)}</p>
+  <div style="margin-top:16px">${mine.length?mine.map(a=>`<div class="row"><div><b>${dayLabel(a.date)} · ${a.time}</b><p>${esc(a.who)} · ${esc(svc(a.svc).name)}</p></div>
+   <div>${a.status==='Confirmed'?`<button class="btn sm" onclick="complete('${a.id}')">Mark completed</button>`:pill('Completed')}</div></div>`).join(''):'<p class="empty">No confirmed appointments yet.</p>'}</div></section>`}
+function accPanel(){
+  const us=D.users.filter(a=>a.role!=='client');
+  return `<section class="panel gap"><h2>Staff accounts</h2>${us.map(a=>`<div class="row"><div><b>${esc(a.name)}</b><p>${esc(a.email)} · ${a.role}</p></div>${a.id===S.user.uid?'':`<button class="btn sm ghost" onclick="delAcc('${a.id}')">Remove</button>`}</div>`).join('')||'<p class="empty">No staff accounts yet.</p>'}
+   <label for="sn2">Add an account</label><input type="text" id="sn2" placeholder="Full name"><div class="tools" style="margin:8px 0"><input type="email" id="se" placeholder="Email" style="flex:1"><input type="password" id="sw" placeholder="Temporary password" style="flex:1"></div>
+   <div class="tools"><select id="sr" style="flex:1"><option value="staff">Front desk</option><option value="therapist">Therapist</option></select><select id="st" style="flex:1">${D.therapists.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('')}</select></div>
+   <p class="note">For a therapist account, choose which therapist profile it belongs to.${DB.mode==='firebase'?' Removing an account deletes its JendellBook profile; delete the login itself in the Firebase console.':''}</p><button class="btn sm" onclick="addStaff()">Create account</button></section>`}
+function admin(){
+  const st=D.settings;
+  return `<h1>Administration</h1><p class="lead">Manage services and therapists, set the booking policy, and review who did what.</p>
+  <div class="grid"><div><section class="panel"><h2>Services</h2>${D.services.map(x=>`<div class="row"><div><b>${esc(x.name)}</b><p>${x.mins} min · ₱${x.price}${x.on===false?' · inactive':''}</p></div><button class="btn sm ghost" onclick="flipSvc('${x.id}')">${x.on===false?'Set active':'Set inactive'}</button></div>`).join('')||`<p class="empty">No services yet. <button class="link" onclick="loadSample()">Load sample services and therapists</button></p>`}
+   <label for="sn">Add a service</label><input type="text" id="sn" placeholder="Service name"><div class="tools" style="margin:8px 0"><input type="number" id="sm" placeholder="Minutes" style="flex:1"><input type="number" id="sp" placeholder="Price (₱)" style="flex:1"></div>
+   <button class="btn sm" onclick="addSvc()">Add service</button></section>
+  <section class="panel gap"><h2>Booking policy</h2><label for="hm">Client has this long to send payment proof (minutes)</label><input type="number" id="hm" value="${st.holdMin}"><label for="co">Client can cancel or reschedule up to (hours before)</label><input type="number" id="co" value="${st.cutoffH}">
+   <label for="vh">Staff must verify within (hours, 0 = no limit)</label><input type="number" id="vh" value="${st.verifyH||0}">
+   <div class="tools" style="margin-top:12px"><button class="btn sm" onclick="saveSettings()">Save policy</button></div></section></div>
+  <div><section class="panel"><h2>Therapists</h2>${D.therapists.map(t=>`<div class="row"><div><b>${esc(t.name)}</b><p>${esc(t.spec)}${t.on?'':' · inactive'}</p></div><button class="btn sm ghost" onclick="flip('${t.id}')">${t.on?'Set inactive':'Set active'}</button></div>`).join('')||'<p class="empty">No therapists yet.</p>'}
+   <label for="tn">Add a therapist</label><div class="tools" style="margin:0 0 8px"><input type="text" id="tn" placeholder="Name" style="flex:1"><input type="text" id="ts" placeholder="Specialty" style="flex:1"></div><button class="btn sm" onclick="addTh()">Add therapist</button></section>
+  <section class="panel gap"><h2>Audit log</h2>${D.log.length?D.log.map(l=>`<div class="row"><div>${esc(l.a)}<p>${fmt(l.at)} · ${esc(l.by||'')} (${esc(l.role)})</p></div></div>`).join(''):'<p class="empty">Approvals, rejections, and other changes are recorded here.</p>'}</section></div></div>`+accPanel()+
+  `<section class="panel gap"><h2>Backup</h2><p class="empty">Download a copy of all bookings, services, therapists, and settings.</p><div class="tools" style="margin-top:10px"><button class="btn sm" onclick="backup()">Download backup (JSON)</button>
+   ${DB.mode==='local'?`<label class="btn sm ghost" style="display:inline-block;margin:0;cursor:pointer">Restore backup<input type="file" accept="application/json" hidden onchange="restoreFile(this)"></label>`:''}</div></section>`}
+function banner(){
+  if(S.fatal)return `<div class="banner err">${esc(S.fatal)}</div>`;
+  return DB.mode==='local'?`<div class="banner">Demo mode: bookings are saved in this browser only, so they are not shared between devices. <button class="link" onclick="resetDemo()">Reset demo data</button></div>`
+    :`<div class="banner ok">Connected to Firebase project ${esc(FIREBASE_CONFIG.projectId)}. Bookings update live on every device.</div>`}
+function render(){
+  const f=document.activeElement;S.dirty=false;
+  if(!S.ready){return}
+  $('#tabs').innerHTML=S.user?`<span>${esc(S.user.name)} · ${S.user.role}</span><button class="btn sm ghost" onclick="logOut()">Log out</button>`:'';
+  if(!DB){$('#app').innerHTML=banner();return}
+  $('#app').innerHTML=banner()+(S.user?{client,staff,therapist,admin}[S.user.role]():auth());tick()}
+/* A live update from the database must not wipe what someone is typing */
+function onData(){const a=document.activeElement;
+  if(a&&a.closest&&a.closest('#app')&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)){S.dirty=true;return}render()}
+addEventListener('focusout',()=>{if(S.dirty)setTimeout(()=>{const a=document.activeElement;if(!(a&&a.closest&&a.closest('#app')&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)))render()},80)});
+
+async function boot(){
+  try{
+    DB=FIREBASE_CONFIG?await makeFirebase(FIREBASE_CONFIG):Local;
+    DB.on(onData);await DB.init();
+    const p=await DB.restore();if(p){S.user=p;S.thView=p.thId||null;await DB.startSync(p)}
+  }catch(e){console.error(e);S.fatal='Could not start the database: '+(e.message||e)+'. Check your Firebase settings, or set FIREBASE_CONFIG to null to use demo mode.';if(!DB)DB=Local}
+  S.ready=true;render()}
+boot();
+</script>
+</body>
+</html>
