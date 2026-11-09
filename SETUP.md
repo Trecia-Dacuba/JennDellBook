@@ -13,7 +13,7 @@ Demo logins are shown on the login screen. "Reset demo data" in the grey banner 
    (Google may ask you to switch to the Blaze pay-as-you-go plan for Storage; it has a free allowance.
    Screenshots need Storage, so this step is required for payment proofs.)
 5. **Project settings > Your apps > Web (</>)**: register an app and copy the `firebaseConfig` object.
-6. In `jendellbook.html`, replace `const FIREBASE_CONFIG = null;` with `const FIREBASE_CONFIG = { ...your config... };`
+6. Copy `firebase-config.js` next to `index.html` (the `public` folder) and paste your config values into it. The app reads the config from this file, so you can replace `index.html` with newer versions without touching your config.
 7. **Create the first owner login** (one time, in the console):
    - Authentication > Users > **Add user** (email + password). Copy its **User UID**.
    - Firestore > **Start collection** `users` > Document ID = that UID > fields:
@@ -62,3 +62,19 @@ Whichever you pick, the API key must never be written into `jendellbook.html`. C
 Cloud Function or a small server. Because only the Notification module talks to the SMS provider
 (your architecture diagram), switching providers later changes one module and nothing else.
 Also tell clients at sign-up that you will text them (Data Privacy Act consent).
+
+
+## The JENDELL menu and schedule
+Services, prices and durations come from the printed flier: 20 services in two groups ("Massage" and "Combo Package"),
+plus Steam Inhalation (Suob, inactive until you set its price and time) and Home Service (1 hour, ₱750).
+Administration > Services shows "Add ... missing menu items" so you can load them once. Everything can be edited afterwards:
+prices, durations, groups, the early bird price, and each therapist's photo, specialty and weekly day off.
+
+Days off loaded from the printed "Schedule of Day Off": Ella Monday, Delia and Klent Tuesday, Lanny Wednesday, Cha Thursday.
+Karl and Tata have no day off set. Therapists cannot be booked on their day off.
+
+Booking rules: bookings lock 15-minute units and start times are offered every 30 minutes, so 20, 30, 45, 75 and
+105-minute services fit properly. The spa opens at 10:00; the last client starts at 21:30 and that session may finish
+after 22:00. The early bird price applies Monday to Friday to sessions that start from 10:00 and finish by 15:00.
+Home service asks for the client's address; set the travel time (each way) in Booking policy so the therapist is blocked while travelling.
+All of these hours and times can be changed in Booking policy.
