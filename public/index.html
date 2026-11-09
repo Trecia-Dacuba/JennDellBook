@@ -27,7 +27,7 @@ h3{font:700 15px Fraunces,Georgia,serif;margin:16px 0 6px}
 .panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px}
 .panel.gap{margin-top:20px}
 label{display:block;font-weight:500;font-size:14px;margin:14px 0 6px}
-select,input[type=text],input[type=number],input[type=password],input[type=email],input[type=tel]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+select,input[type=time],input[type=text],input[type=number],input[type=password],input[type=email],input[type=tel]{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
 input[type=file]{font-size:14px;max-width:100%}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 12px;border-radius:8px;font:inherit;font-size:14px;cursor:pointer}
@@ -67,6 +67,7 @@ th{font-weight:700;border-top:0}
 .banner{background:var(--chip);border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-size:13px;color:var(--muted);margin-bottom:20px}
 .banner.ok{border-color:var(--jade);color:var(--ink)}
 .banner.err{border-color:var(--bad);color:var(--bad)}
+.prof{display:flex;gap:12px;align-items:center;margin-top:10px}.prof img,.ini{width:56px;height:56px;border-radius:50%;object-fit:cover}.ini{background:var(--chip);display:grid;place-items:center;font:700 22px Fraunces,Georgia,serif}
 .thumb{display:block;max-width:150px;max-height:110px;border-radius:8px;border:1px solid var(--line);margin-top:8px;cursor:zoom-in}
 #lightbox{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;z-index:20}
 #lightbox.on{display:flex}
@@ -84,21 +85,15 @@ th{font-weight:700;border-top:0}
 <main id="app"><p class="empty">Loading…</p></main>
 <div id="lightbox" role="dialog" aria-label="Payment screenshot" onclick="this.classList.remove('on')"><img alt="Payment screenshot"></div>
 <div id="toast" role="status" aria-live="polite"></div>
+<script src="firebase-config.js"></script>
 <script>
 /* =====================================================================
    SETTINGS
-   Leave FIREBASE_CONFIG as null to run in DEMO MODE (data is saved in this
-   browser). To use the real Firebase database, paste your web-app config:
-   const FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",storageBucket:"...",messagingSenderId:"...",appId:"..."};
+   DEMO MODE (data saved in this browser) runs when there is no firebase-config.js next to this file.
+   To use the real Firebase database, create public/firebase-config.js containing:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",storageBucket:"...",messagingSenderId:"...",appId:"..."};
    ===================================================================== */
-const FIREBASE_CONFIG = {
-  apiKey: "AIzaSyDrDi83zkrwz36hX7qHhrYAWnLT6UeEAiA",
-  authDomain: "jenndellbook.firebaseapp.com",
-  projectId: "jenndellbook",
-  storageBucket: "jenndellbook.firebasestorage.app",
-  messagingSenderId: "608560989008",
-  appId: "1:608560989008:web:90578eef062c8d52762255"
-};
+const FIREBASE_CONFIG = window.FIREBASE_CONFIG || null;   // set in firebase-config.js (next to this file)
 /* Payment screenshots: false = keep a small compressed copy inside the booking record in Firestore (works on the free Spark plan).
    true = use Firebase Cloud Storage (needs the Blaze pay-as-you-go plan, and storage.rules published). */
 const USE_CLOUD_STORAGE = false;
@@ -112,9 +107,12 @@ const uid=()=>'x'+Math.random().toString(36).slice(2,10)+Date.now().toString(36)
 const pad=n=>String(n).padStart(2,'0');
 const dkey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());       // local date, not UTC
 const fmt=ms=>new Date(ms).toLocaleString('en-PH',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
-const TIMES=['10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00'];   // 1-hour slots, spa closes at 18:00
+const UNIT=15,STEP=30;                                    // a booking locks 15-minute units; start times are offered every 30 minutes
+const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m};
+const toHM=n=>pad(Math.floor(n/60))+':'+pad(n%60);
+const fmtMins=m=>m<60?m+' min':Math.floor(m/60)+' hr'+(m%60?' '+m%60+' min':'');
 const LIVE=['Pending Payment','Pending Verification','Confirmed','Completed'];
-const DEFAULTS={holdMin:30,cutoffH:2,verifyH:0};   // verifyH: 0 = no time limit for staff once proof is sent
+const DEFAULTS={holdMin:30,cutoffH:2,verifyH:0,open:'10:00',lastStart:'21:30',earlyFrom:'10:00',earlyTo:'15:00',travelMin:0};   // verifyH: 0 = no time limit for staff once proof is sent; travelMin: buffer each way for home service
 let _dc=null;
 function days(){const k=dkey(new Date());if(_dc&&_dc.k===k)return _dc.v;
   const v=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()+i);return{key:dkey(d),label:d.toLocaleDateString('en-PH',{weekday:'short',month:'short',day:'numeric'})}});
@@ -125,7 +123,7 @@ const isPast=(date,time)=>startMs(date,time)<=Date.now();
 
 /* In-memory cache that the screens read from. The database adapters keep it live. */
 const D={users:[],services:[],therapists:[],appointments:[],slots:{},notes:[],log:[],settings:{...DEFAULTS}};
-const S={user:null,mode:'client',reg:false,resch:null,ready:false,busy:false,fatal:null,race:false,thView:null,exp:new Set(),dirty:false,
+const S={edit:null,user:null,mode:'client',reg:false,resch:null,ready:false,busy:false,fatal:null,race:false,thView:null,exp:new Set(),dirty:false,
   walk:{svc:null,th:null,day:null,time:null,name:''},sel:{svc:null,th:null,day:null,time:null}};
 let DB=null;
 
@@ -142,10 +140,24 @@ const pill=s=>`<span class="pill ${s.split(' ')[0]}">${s}</span>`;
    A 90-minute service locks two consecutive hours.
    --------------------------------------------------------------------- */
 const slotId=(th,date,time)=>th+'_'+date+'_'+time.replace(':','');
-function needed(th,date,time,mins){const i=TIMES.indexOf(time),n=Math.ceil(mins/60);if(i<0||i+n>TIMES.length)return null;return TIMES.slice(i,i+n).map(t=>slotId(th,date,t))}
+const units=(th,date,time,mins)=>{const s=toMin(time),n=Math.ceil(mins/UNIT);return Array.from({length:n},(_,k)=>slotId(th,date,toHM(s+k*UNIT)))};
+const DAYN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const wdayOf=date=>{const[y,m,d]=date.split('-').map(Number);return new Date(y,m-1,d).getDay()};
+const blk=sv=>sv&&sv.home?{pre:+D.settings.travelMin||0,post:+D.settings.travelMin||0}:{pre:0,post:0};
+function needed(th,date,time,sv){                      // the 15-minute units a booking must lock (home service adds travel time each way)
+  const b=blk(sv),t=toMin(time);if(t<toMin(D.settings.open)||t>toMin(D.settings.lastStart))return null;
+  const s0=t-b.pre,n=Math.ceil((sv.mins+b.pre+b.post)/UNIT);if(s0<0||s0+n*UNIT>1440)return null;
+  return units(th,date,toHM(s0),n*UNIT)}
+function times(){const r=[];for(let m=toMin(D.settings.open);m<=toMin(D.settings.lastStart);m+=STEP)r.push(toHM(m));return r}
+const endHM=(time,mins)=>toHM(toMin(time)+mins);
+const when=a=>dayLabel(a.date)+' · '+a.time+'–'+endHM(a.time,svc(a.svc).mins);
+const isEarly=(date,time,mins)=>{const wd=wdayOf(date),t=toMin(time);return wd>=1&&wd<=5&&t>=toMin(D.settings.earlyFrom)&&t+mins<=toMin(D.settings.earlyTo)};   // must START after earlyFrom and FINISH by earlyTo
+const priceAt=(sv,date,time)=>sv.promo&&date&&time&&isEarly(date,time,sv.mins)?sv.promo:sv.price;
+const isOff=(th,date)=>((D.therapists.find(x=>x.id===th)||{}).off||[]).includes(wdayOf(date));
+const offNote=(th,date)=>isOff(th,date)?`<p class="tag">${esc((D.therapists.find(x=>x.id===th)||{}).name)} has a day off on this day.</p>`:'';
 const slotLive=l=>!!l&&(l.holdUntil==null||l.holdUntil>Date.now());
-function free(th,date,time,mins,mine){
-  const ids=needed(th,date,time,mins);if(!ids||isPast(date,time))return false;
+function free(th,date,time,sv,mine){
+  const ids=needed(th,date,time,sv);if(!ids||isPast(date,time)||isOff(th,date))return false;
   return ids.every(i=>{const l=D.slots[i];return !slotLive(l)||(mine&&l.apptId===mine)})}
 const lockDoc=(a,holdUntil)=>({apptId:a.id,th:a.th,date:a.date,holdUntil});
 const note=(to,m,ph)=>({to,m:('JENDELL: '+m).slice(0,160),ph:ph||'',t:Date.now()});
@@ -154,9 +166,9 @@ const logDoc=a=>({at:Date.now(),by:S.user.name,role:S.user.role,a});
 /* ---------------------------------------------------------------------
    Image helper: shrink a payment screenshot before it is stored
    --------------------------------------------------------------------- */
-async function shrink(file,small){
+async function shrink(file,small,max){
   if(!/^image\//.test(file.type))throw new Error('notimage');
-  const bmp=await createImageBitmap(file),sc=Math.min(1,(small?640:900)/Math.max(bmp.width,bmp.height));
+  const bmp=await createImageBitmap(file),sc=Math.min(1,(max||(small?640:900))/Math.max(bmp.width,bmp.height));
   const c=document.createElement('canvas');c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);
   c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
   const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',small?.55:.7));
@@ -196,9 +208,9 @@ const Local={
     await mk('u4','marites@jendell.ph','therapist123','Marites','therapist',{thId:'t1'});
     await mk('u5','joyce@jendell.ph','therapist123','Joyce','therapist',{thId:'t2'});
     await mk('u6','lorna@jendell.ph','therapist123','Lorna','therapist',{thId:'t3'});
-    const today=dkey(new Date()),seedAppt=(id,who,sv,th,time)=>{const s=slotId(th,today,time);
-      db.appointments[id]={who,cid:null,ph:'',svc:sv,th,date:today,time,slots:[s],status:'Confirmed',holdUntil:null,proofs:[{ref:'GC'+id,file:'seed.png',url:'',st:'Verified'}],created:Date.now()};
-      db.slots[s]={apptId:id,th,date:today,holdUntil:null}};
+    const today=dkey(new Date()),seedAppt=(id,who,sv,th,time)=>{const ids=units(th,today,time,60);
+      db.appointments[id]={who,cid:null,ph:'',svc:sv,th,date:today,time,slots:ids,price:700,status:'Confirmed',holdUntil:null,proofs:[{ref:'GC'+id,file:'seed.png',url:'',st:'Verified'}],created:Date.now()};
+      ids.forEach(s=>{db.slots[s]={apptId:id,th,date:today,holdUntil:null}})};
     seedAppt('a1','Ana R.','s2','t2','11:00');seedAppt('a2','Ben L.','s1','t1','13:00');
     db.settings.main={...DEFAULTS};this.save(db)},
   save(db){store.set(JSON.stringify(db))},
@@ -337,8 +349,9 @@ function auth(){
 function pick(k,v){S.sel[k]=v;if(k==='svc'||k==='th'||k==='day')S.sel.time=null;render()}
 const book=run(async()=>{
   const s=S.sel,sv=svc(s.svc);if(!s.time)return toast('Choose a time slot first.');
+  const addr=sv.home?($('#addr')?$('#addr').value.trim():''):'';if(sv.home&&addr.length<8)return toast('Enter the full home address for the home service.');
   if(S.race&&DB.mode==='local'){S.race=false;await rival(s)}                       // test helper: another client grabs the slot first
-  const ids=needed(s.th,s.day,s.time,sv.mins);if(!ids)throw new Error('taken');
+  const ids=needed(s.th,s.day,s.time,sv);if(!ids||isOff(s.th,s.day))throw new Error('taken');
   if(S.resch){
     const id=S.resch;
     await DB.txn(async t=>{
@@ -349,7 +362,7 @@ const book=run(async()=>{
       olds.forEach(([i,l])=>{if(l&&l.apptId===id&&!ids.includes(i))t.del('slots',i)});                      // …then writes
       const hold=['Confirmed','Completed'].includes(a.status)?null:a.holdUntil;
       ids.forEach(i=>t.set('slots',i,lockDoc({id,th:s.th,date:s.day},hold)));
-      t.set('appointments',id,{...a,svc:s.svc,th:s.th,date:s.day,time:s.time,slots:ids});
+      t.set('appointments',id,{...a,svc:s.svc,th:s.th,date:s.day,time:s.time,slots:ids,price:priceAt(sv,s.day,s.time)});
       if(a.cid)t.set('notes',uid(),note(a.cid,'Your booking was moved to '+dayLabel(s.day)+' at '+s.time+'.',a.ph));
     });
     S.resch=null;S.sel.time=null;return toast('Booking rescheduled.')}
@@ -358,10 +371,10 @@ const book=run(async()=>{
     const cur=await Promise.all(ids.map(i=>t.get('slots',i)));                                              // read every slot…
     if(cur.some(slotLive))throw new Error('taken');                                                         // …all-or-nothing check…
     ids.forEach(i=>t.set('slots',i,lockDoc({id,th:s.th,date:s.day},hold)));                                // …then lock them all
-    t.set('appointments',id,{who:S.user.name,cid:S.user.uid,ph:S.user.phone||'',svc:s.svc,th:s.th,date:s.day,time:s.time,slots:ids,status:'Pending Payment',holdUntil:hold,proofs:[],created:Date.now()});
+    t.set('appointments',id,{who:S.user.name,cid:S.user.uid,ph:S.user.phone||'',svc:s.svc,th:s.th,date:s.day,time:s.time,slots:ids,price:priceAt(sv,s.day,s.time),addr,status:'Pending Payment',holdUntil:hold,proofs:[],created:Date.now()});
   });
   S.sel.time=null;toast('Slot held for '+D.settings.holdMin+' minutes. Submit your GCash proof to continue.')});
-async function rival(s){const ids=needed(s.th,s.day,s.time,svc(s.svc).mins),rid=uid(),h=Date.now()+60000;
+async function rival(s){const ids=needed(s.th,s.day,s.time,svc(s.svc)),rid=uid(),h=Date.now()+60000;
   await DB.txn(async t=>{ids.forEach(i=>t.set('slots',i,{apptId:rid,th:s.th,date:s.day,holdUntil:h}));
     t.set('appointments',rid,{who:'Another client',cid:null,ph:'',svc:s.svc,th:s.th,date:s.day,time:s.time,slots:ids,status:'Pending Payment',holdUntil:h,proofs:[],created:Date.now()})})}
 const sendProof=run(async id=>{
@@ -434,13 +447,26 @@ function wpick(k,v){S.walk.name=$('#wn').value;S.walk[k]=v;if(k!=='time'&&k!=='n
 const walkIn=run(async()=>{
   const n=$('#wn').value.trim(),w=S.walk;S.walk.name=n;
   if(!n)return toast('Enter the client’s name.');if(!w.time)return toast('Choose a time slot.');
-  const ids=needed(w.th,w.day,w.time,svc(w.svc).mins);if(!ids)throw new Error('taken');const id=uid();
+  const wsv=svc(w.svc),addr=wsv.home?$('#wa').value.trim():'';if(wsv.home&&addr.length<8)return toast('Enter the full home address.');
+  const ids=needed(w.th,w.day,w.time,svc(w.svc));if(!ids||isOff(w.th,w.day))throw new Error('taken');const id=uid();
   await DB.txn(async t=>{
     const cur=await Promise.all(ids.map(i=>t.get('slots',i)));if(cur.some(slotLive))throw new Error('taken');
     ids.forEach(i=>t.set('slots',i,lockDoc({id,th:w.th,date:w.day},null)));
-    t.set('appointments',id,{who:n,cid:null,ph:'',svc:w.svc,th:w.th,date:w.day,time:w.time,slots:ids,status:'Confirmed',holdUntil:null,proofs:[],created:Date.now()});
+    t.set('appointments',id,{who:n,cid:null,ph:'',svc:w.svc,th:w.th,date:w.day,time:w.time,slots:ids,price:priceAt(svc(w.svc),w.day,w.time),addr,status:'Confirmed',holdUntil:null,proofs:[],created:Date.now()});
     t.set('log',uid(),logDoc('Entered walk-in booking for '+n))});
   w.time=null;w.name='';toast('Walk-in booking saved and confirmed.')});
+const editOn=(k,id)=>{S.edit={k,id};render()};
+const editOff=()=>{S.edit=null;render()};
+const saveSvc=run(async id=>{
+  const n=$('#en').value.trim(),m=+$('#em').value,p=+$('#ep').value,pr=$('#epr').value.trim(),c=$('#ec').value.trim();
+  if(!n||!(m>0)||!(p>0)||(pr!==''&&!(+pr>0)))return toast('Enter a name, minutes, a price, and (optionally) a valid early bird price.');
+  await DB.update('services',id,{name:n,mins:m,price:p,cat:c,promo:pr===''?null:+pr});
+  await DB.set('log',uid(),logDoc('Edited service: '+n+' ('+m+' min, ₱'+p+(pr?', early bird ₱'+pr:'')+')'));S.edit=null;toast('Service saved.')});
+const saveTh=run(async id=>{
+  const n=$('#etn').value.trim(),sp=$('#ets').value.trim(),f=$('#etp').files[0];
+  if(!n)return toast('Enter the therapist’s name.');
+  const patch={name:n,spec:sp,off:[...document.querySelectorAll('#eoff input:checked')].map(x=>+x.value)};if(f)patch.photo=(await shrink(f,true,320)).url;
+  await DB.update('therapists',id,patch);await DB.set('log',uid(),logDoc('Edited therapist: '+n));S.edit=null;toast('Therapist saved.')});
 const addSvc=run(async()=>{const n=$('#sn').value.trim(),m=+$('#sm').value,p=+$('#sp').value;
   if(!n||!(m>0)||!(p>0))return toast('Fill in name, minutes, and price.');
   await DB.set('services',uid(),{name:n,mins:m,price:p,on:true});await DB.set('log',uid(),logDoc('Added service: '+n))});
@@ -448,8 +474,10 @@ const flipSvc=run(async id=>{const s=svc(id);await DB.update('services',id,{on:s
 const addTh=run(async()=>{const n=$('#tn').value.trim(),sp=$('#ts').value.trim();if(!n)return toast('Enter the therapist’s name.');
   await DB.set('therapists',uid(),{name:n,spec:sp,on:true});await DB.set('log',uid(),logDoc('Added therapist: '+n))});
 const flip=run(async id=>{const t=thr(id);await DB.update('therapists',id,{on:!t.on});await DB.set('log',uid(),logDoc((t.on?'Deactivated ':'Activated ')+t.name))});
-const saveSettings=run(async()=>{const h=+$('#hm').value,c=+$('#co').value,v=+$('#vh').value;if(!(h>=5&&h<=120)||!(c>=0&&c<=72)||!(v>=0&&v<=24))return toast('Hold time must be 5 to 120 minutes, the cutoff 0 to 72 hours, and the staff limit 0 to 24 hours.');
-  await DB.set('settings','main',{holdMin:h,cutoffH:c,verifyH:v});await DB.set('log',uid(),logDoc('Policy changed: hold '+h+' min, cancellation cutoff '+c+' h, staff limit '+v+' h'));toast('Policy saved.')});
+const saveSettings=run(async()=>{const h=+$('#hm').value,c=+$('#co').value,v=+$('#vh').value,o=$('#to').value,cl=$('#tc').value,ef=$('#ef').value,et=$('#et').value,tr=+$('#tr').value;
+  if(!(h>=5&&h<=120)||!(c>=0&&c<=72)||!(v>=0&&v<=24))return toast('Hold time must be 5 to 120 minutes, the cutoff 0 to 72 hours, and the staff limit 0 to 24 hours.');
+  if(!o||!cl||toMin(o)>=toMin(cl)||!ef||!et||toMin(ef)>=toMin(et)||!(tr>=0&&tr<=180))return toast('Opening time must be before the last start time, the early bird start before its end, and travel time 0 to 180 minutes.');
+  await DB.set('settings','main',{holdMin:h,cutoffH:c,verifyH:v,open:o,lastStart:cl,earlyFrom:ef,earlyTo:et,travelMin:tr});await DB.set('log',uid(),logDoc('Policy changed: hold '+h+' min, cutoff '+c+' h, staff limit '+v+' h, open '+o+', last start '+cl+', early bird '+ef+'-'+et+', travel '+tr+' min'));toast('Policy saved.')});
 const addStaff=run(async()=>{const n=$('#sn2').value.trim(),e=$('#se').value.trim().toLowerCase(),pw=$('#sw').value,r=$('#sr').value;
   if(!n||!/^\S+@\S+\.\S+$/.test(e)||pw.length<6)return toast('Enter a name, a valid email, and a password of at least 6 characters.');
   if(r==='therapist'&&!$('#st').value)return toast('Add a therapist profile first.');
@@ -457,18 +485,36 @@ const addStaff=run(async()=>{const n=$('#sn2').value.trim(),e=$('#se').value.tri
   catch(x){if(x.message==='exists'||x.code==='auth/email-already-in-use')return toast('That email already has an account.');throw x}
   await DB.set('log',uid(),logDoc('Created '+r+' account for '+n));toast('Account created. They can log in from the Staff tab.')});
 const delAcc=run(async id=>{const u=D.users.find(x=>x.id===id);await DB.del('users',id);await DB.set('log',uid(),logDoc('Removed account '+(u?u.email:id)))});
-const loadSample=run(async()=>{
-  const sv=[['Swedish massage',60,700],['Deep tissue massage',60,850],['Hot stone therapy',90,1200]],th=[['Marites','Swedish, aromatherapy'],['Joyce','Deep tissue, sports'],['Lorna','Hot stone']];
-  for(const[n,m,p]of sv)await DB.set('services',uid(),{name:n,mins:m,price:p,on:true});
-  for(const[n,s]of th)await DB.set('therapists',uid(),{name:n,spec:s,on:true});
-  await DB.set('settings','main',{...DEFAULTS});toast('Sample services and therapists added.')});
+const M=(cat,name,mins,price,extra)=>({cat,name,mins,price,...extra});
+const MENU=[
+ M('Massage','Full Body Massage w/ Hot Compress (Combination)',60,450),M('Massage','Swedish Massage',60,450),M('Massage','Deep Tissue Massage',60,450),
+ M('Massage','Therapeutic Massage w/ Hilot',90,550),M('Massage','Reflexology',60,450),M('Massage','Hilot (Pilay, Ipit Ugat, Lagnat, Taas Matres)',20,300),
+ M('Massage','Back Massage',20,300),M('Massage','Back Massage w/ Hotstone or Ventosa',45,400),M('Massage','Half Body (Lying)',30,400),
+ M('Massage','Half Body w/ Ventosa or Hotstone',60,450),M('Massage','Foot Massage',30,350),M('Massage','Baby Massage (5 years old below)',30,275),
+ M('Massage','Full Body Massage, Young Adult (6 to 12 yrs old)',60,400),
+ M('Combo Package','Full Body Massage w/ Hotstone or Ventosa',90,550,{promo:450}),M('Combo Package','Full Body Massage w/ Ear Candling',75,550),
+ M('Combo Package','Full Body Massage w/ Scanning Ventosa',90,550),M('Combo Package','Foot Scrub w/ Foot Massage',30,550),
+ M('Combo Package','Therapeutic w/ Ventosa or Hotstone',90,700),M('Combo Package','Steam Sauna',105,800),M('Combo Package','Body Scrub',105,850),
+ M('Other','Steam Inhalation (Suob)',30,0,{on:false}),                         // price and time to be set by the owner, then activate
+ M('Home Service','Home Service (1 hour)',60,750,{home:true})];
+const THERAPISTS=['Ella','Delia','Cha','Lanny','Karl','Tata','Klent'];
+const DAYOFF={Ella:[1],Delia:[2],Klent:[2],Lanny:[3],Cha:[4]};   // from the spa's printed "Schedule of Day Off" (0 = Sunday ... 6 = Saturday); Klent takes the Tuesday slot
+const menuGap=()=>({svc:MENU.filter(m=>!D.services.some(x=>x.name===m.name)),th:THERAPISTS.filter(n=>!D.therapists.some(t=>t.name===n)),off:D.therapists.filter(t=>DAYOFF[t.name]&&!(t.off||[]).length)});
+const loadMenu=run(async()=>{
+  const g=menuGap();if(!g.svc.length&&!g.th.length&&!g.off.length)return toast('The menu is already complete.');
+  if(!confirm('Add '+g.svc.length+' services and '+g.th.length+' therapists, and set '+g.off.length+' existing days off?'))return;
+  for(const m of g.svc)await DB.set('services',uid(),{name:m.name,mins:m.mins,price:m.price,cat:m.cat,promo:m.promo||null,home:!!m.home,on:m.on!==false});
+  for(const n of g.th)await DB.set('therapists',uid(),{name:n,spec:'',off:DAYOFF[n]||[],on:true});
+  for(const t of g.off)await DB.update('therapists',t.id,{off:DAYOFF[t.name]});
+  if(!D.services.length)await DB.set('settings','main',{...DEFAULTS});
+  await DB.set('log',uid(),logDoc('Loaded menu items: '+g.svc.length+' services, '+g.th.length+' therapists'));toast('JENDELL menu updated.')});
 const backup=run(async()=>{download('jendellbook-backup-'+dkey(new Date())+'.json',JSON.stringify(await DB.exportAll(),null,1),'application/json');toast('Backup downloaded.')});
 const restoreFile=run(async el=>{const f=el.files[0];if(!f)return;if(!confirm('Replace ALL current data with this backup?'))return;
   await DB.importAll(JSON.parse(await f.text()));S.user=null;toast('Backup restored. Please log in again.')});
 const resetDemo=run(async()=>{if(!confirm('Erase everything saved in this browser and restore the sample data?'))return;await Local.reset();S.user=null;S.mode='client';toast('Demo data reset.')});
 function csv(){const safe=c=>{c=String(c??'');return '"'+(/^[=+\-@]/.test(c)?"'"+c:c).replace(/"/g,'""')+'"'};
-  const rows=[['Booking','Client','Service','Therapist','Date','Time','Status','Payment proofs']];
-  D.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).forEach(a=>rows.push([a.id,a.who,svc(a.svc).name,thr(a.th).name,a.date,a.time,a.status,(a.proofs||[]).map(p=>p.ref+':'+p.st).join(' | ')]));
+  const rows=[['Booking','Client','Service','Therapist','Date','Time','Price','Status','Payment proofs']];
+  D.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).forEach(a=>rows.push([a.id,a.who,svc(a.svc).name,thr(a.th).name,a.date,a.time,a.price??svc(a.svc).price,a.status,(a.proofs||[]).map(p=>p.ref+':'+p.st).join(' | ')]));
   download('jendellbook-bookings-'+dkey(new Date())+'.csv',rows.map(r=>r.map(safe).join(',')).join('\n'),'text/csv')}
 
 /* ---- timer: release held slots whose time ran out, update countdowns ---- */
@@ -479,24 +525,29 @@ function tick(){
 setInterval(tick,1000);
 
 /* ---- views ---- */
+const optSvc=(list,cur)=>{const cats=[...new Set(list.map(x=>x.cat||''))];
+  return cats.map(c=>{const o=list.filter(x=>(x.cat||'')===c).map(x=>`<option value="${x.id}" ${x.id===cur?'selected':''}>${esc(x.name)} · ${fmtMins(x.mins)} · ${x.price>0?'₱'+x.price:'price not set yet'}${x.home?' · home service':''}${x.promo?' (early bird ₱'+x.promo+')':''}</option>`).join('');return c?`<optgroup label="${esc(c)}">${o}</optgroup>`:o}).join('')};
+const optTh=(list,cur)=>list.map(x=>`<option value="${x.id}" ${x.id===cur?'selected':''}>${esc(x.name)}${x.spec?' ('+esc(x.spec)+')':''}</option>`).join('');
+const thCard=t=>t?`<div class="prof">${t.photo?`<img src="${esc(t.photo)}" alt="Photo of ${esc(t.name)}">`:`<span class="ini">${esc((t.name||'?')[0])}</span>`}<div><b>${esc(t.name)}</b><p>${esc(t.spec||'JENDELL therapist')}</p></div></div>`:'';
 function chipsDay(cur,fn){return days().map(d=>`<button class="chip" aria-pressed="${d.key===cur}" onclick="${fn}('day','${d.key}')">${d.label}</button>`).join('')}
-function chipsTime(th,day,cur,m,fn,mine){return TIMES.map(t=>`<button class="chip" aria-pressed="${t===cur}" ${free(th,day,t,m,mine)?'':'disabled'} onclick="${fn}('time','${t}')">${t}</button>`).join('')}
+function chipsTime(th,day,cur,sv,fn,mine){return times().map(t=>`<button class="chip" aria-pressed="${t===cur}" ${free(th,day,t,sv,mine)?'':'disabled'} onclick="${fn}('time','${t}')">${t}</button>`).join('')}
 function client(){
   const s=S.sel,ths=D.therapists.filter(t=>t.on),sv=D.services.filter(x=>x.on!==false),mine=D.appointments.filter(a=>a.cid===S.user.uid).sort((a,b)=>b.created-a.created);
   if(!s.day||!days().some(d=>d.key===s.day))s.day=days()[0].key;
   if(!sv.find(x=>x.id===s.svc))s.svc=sv[0]&&sv[0].id;if(!ths.find(t=>t.id===s.th))s.th=ths[0]&&ths[0].id;
   const m=svc(s.svc).mins,ready=sv.length&&ths.length;
   const form=!ready?'<p class="empty">The spa has not published its services and therapists yet. Please check back soon.</p>':`
-   <label for="svc">Service</label><select id="svc" onchange="pick('svc',this.value)">${sv.map(x=>`<option value="${x.id}" ${x.id===s.svc?'selected':''}>${esc(x.name)} · ${x.mins} min · ₱${x.price}</option>`).join('')}</select>
-   <label for="th">Therapist</label><select id="th" onchange="pick('th',this.value)">${ths.map(x=>`<option value="${x.id}" ${x.id===s.th?'selected':''}>${esc(x.name)} (${esc(x.spec)})</option>`).join('')}</select>
+   <label for="svc">Service</label><select id="svc" onchange="pick('svc',this.value)">${optSvc(sv,s.svc)}</select>
+   <label for="th">Therapist</label><select id="th" onchange="pick('th',this.value)">${optTh(ths,s.th)}</select>${thCard(thr(s.th))}
    <label>Day</label><div class="chips">${chipsDay(s.day,'pick')}</div>
-   <label>Time</label><div class="chips">${chipsTime(s.th,s.day,s.time,m,'pick',S.resch)}</div>
-   <p class="note">Struck-through times are already booked or have passed.${m>60?' This service takes '+m+' minutes, so it needs '+Math.ceil(m/60)+' free hours in a row.':''}</p>
+   <label>Time</label><div class="chips">${chipsTime(s.th,s.day,s.time,svc(s.svc),'pick',S.resch)}</div>${offNote(s.th,s.day)}
+   ${svc(s.svc).home?`<label for="addr">Home address (where the therapist should go)</label><input type="text" id="addr" autocomplete="street-address" placeholder="House no., street, barangay, city">`:''}
+   <p class="note">Struck-through times are already booked or have passed.This service takes ${fmtMins(m)}.${svc(s.svc).promo?' Early bird price ₱'+svc(s.svc).promo+' for sessions that start from '+D.settings.earlyFrom+' and finish by '+D.settings.earlyTo+', Monday to Friday.':''}${s.time?' <b>Price for '+s.time+': ₱'+priceAt(svc(s.svc),s.day,s.time)+(priceAt(svc(s.svc),s.day,s.time)<svc(s.svc).price?' (early bird)':'')+'</b>':''}</p>
    <div class="tools"><button class="btn" onclick="book()">${S.resch?'Move booking':'Hold this slot'}</button>${S.resch?'<button class="btn ghost" onclick="cancelResch()">Keep original time</button>':''}</div>
    ${DB.mode==='local'?`<label style="font-weight:400"><input type="checkbox" ${S.race?'checked':''} onchange="S.race=this.checked"> Test the conflict check: let another client grab the chosen slot first</label>`:''}`;
   return `<h1>Hi, ${esc(S.user.name.split(' ')[0])}. Book a massage</h1><p class="lead">Pick a service, therapist, and time. Your slot is held for ${D.settings.holdMin} minutes while you send the ₱100 reservation fee through GCash. Once your proof is in, the timer stops until staff verify it.</p>
   <div class="grid"><section class="panel"><h2>${S.resch?'Reschedule booking':'New booking'}</h2>${form}</section>
-  <section class="panel"><h2>My bookings</h2>${mine.length?mine.map(a=>{const lp=(a.proofs||[])[(a.proofs||[]).length-1];return `<div class="row"><div style="flex:1;min-width:0"><b>${esc(svc(a.svc).name)}</b><p>${esc(thr(a.th).name)} · ${dayLabel(a.date)} · ${a.time}</p>
+  <section class="panel"><h2>My bookings</h2>${mine.length?mine.map(a=>{const lp=(a.proofs||[])[(a.proofs||[]).length-1];return `<div class="row"><div style="flex:1;min-width:0"><b>${esc(svc(a.svc).name)}</b><p>${esc(thr(a.th).name)} · ${when(a)} · ₱${a.price??svc(a.svc).price}</p>
    ${a.status==='Pending Payment'?`<div class="proof"><b>Send your ₱100 reservation fee</b><p>Send ₱100 to JENDELL’s GCash (sample number: 0917 000 1234), then enter the reference number from your receipt. The screenshot should show the amount and reference number.</p><p class="hold">Slot held for <span data-hold="${a.holdUntil}"></span></p>${lp&&lp.st==='Rejected'?`<p class="tag">Your last proof (${esc(lp.ref)}) was rejected. Send a corrected one.</p>`:''}
      <label for="ref${a.id}">GCash reference number</label><input type="text" id="ref${a.id}" inputmode="text" autocomplete="off">
      <label for="file${a.id}">Screenshot of payment</label><input type="file" id="file${a.id}" accept="image/*">
@@ -513,10 +564,11 @@ function walkPanel(){
   const m=svc(w.svc).mins;
   return `<section class="panel gap"><h2>Walk-in or phone booking</h2><p class="empty">Enter a booking for someone who called or walked in. It is confirmed right away.</p>
    <label for="wn">Client name</label><input type="text" id="wn" value="${esc(w.name||'')}">
-   <label for="ws">Service</label><select id="ws" onchange="wpick('svc',this.value)">${sv.map(x=>`<option value="${x.id}" ${x.id===w.svc?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
-   <label for="wt">Therapist</label><select id="wt" onchange="wpick('th',this.value)">${ths.map(x=>`<option value="${x.id}" ${x.id===w.th?'selected':''}>${esc(x.name)}</option>`).join('')}</select>
+   <label for="ws">Service</label><select id="ws" onchange="wpick('svc',this.value)">${optSvc(sv,w.svc)}</select>
+   <label for="wt">Therapist</label><select id="wt" onchange="wpick('th',this.value)">${optTh(ths,w.th)}</select>
    <label>Day</label><div class="chips">${chipsDay(w.day,'wpick')}</div>
-   <label>Time</label><div class="chips">${chipsTime(w.th,w.day,w.time,m,'wpick')}</div>
+   <label>Time</label><div class="chips">${chipsTime(w.th,w.day,w.time,svc(w.svc),'wpick')}</div>${offNote(w.th,w.day)}
+   ${svc(w.svc).home?`<label for="wa">Home address</label><input type="text" id="wa">`:''}
    <div class="tools" style="margin-top:14px"><button class="btn" onclick="walkIn()">Save booking</button></div></section>`}
 function reportPanel(){
   const live=D.appointments.filter(a=>LIVE.includes(a.status));
@@ -530,15 +582,15 @@ function staff(){
   const q=D.appointments.filter(a=>a.status==='Pending Verification');
   const all=D.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
   return `<h1>Front desk</h1><p class="lead">Check each submitted reference number and screenshot against the spa’s GCash history, then verify or reject.</p>
-  <section class="panel"><h2>Payment verification queue</h2>${q.length?q.map(a=>{const p=a.proofs[a.proofs.length-1];return `<div class="row"><div><b>${esc(a.who)}</b> · ${esc(svc(a.svc).name)}<p>${esc(thr(a.th).name)} · ${dayLabel(a.date)} · ${a.time}</p><p>Reference: <b>${esc(p.ref)}</b> · Sent ${p.at?fmt(p.at):''}</p>${a.holdUntil?`<p class="hold">Slot is released in: <span data-hold="${a.holdUntil}"></span></p>`:''}${p.url?`<img class="thumb" alt="Payment screenshot from ${esc(a.who)}" src="${esc(p.url)}" onclick="showImg(this.src)">`:`<p>Screenshot: ${esc(p.file)}</p>`}</div>
+  <section class="panel"><h2>Payment verification queue</h2>${q.length?q.map(a=>{const p=a.proofs[a.proofs.length-1];return `<div class="row"><div><b>${esc(a.who)}</b> · ${esc(svc(a.svc).name)}<p>${esc(thr(a.th).name)} · ${when(a)}</p>${a.addr?`<p>Home service: ${esc(a.addr)}</p>`:''}<p>Reference: <b>${esc(p.ref)}</b> · Sent ${p.at?fmt(p.at):''}</p>${a.holdUntil?`<p class="hold">Slot is released in: <span data-hold="${a.holdUntil}"></span></p>`:''}${p.url?`<img class="thumb" alt="Payment screenshot from ${esc(a.who)}" src="${esc(p.url)}" onclick="showImg(this.src)">`:`<p>Screenshot: ${esc(p.file)}</p>`}</div>
    <div class="tools"><button class="btn sm" onclick="decide('${a.id}',true)">Verify</button><button class="btn sm bad" onclick="decide('${a.id}',false)">Reject</button></div></div>`}).join(''):'<p class="empty">Nothing to verify. New proofs appear here when a client sends one.</p>'}</section>
   <section class="panel gap"><h2>Schedule across all therapists</h2><div class="scroll"><table><tr><th>When</th><th>Therapist</th><th>Client</th><th>Service</th><th>Status</th></tr>
-   ${all.map(a=>`<tr><td>${dayLabel(a.date)} ${a.time}</td><td>${esc(thr(a.th).name)}</td><td>${esc(a.who)}</td><td>${esc(svc(a.svc).name)}</td><td>${pill(a.status)}${a.status==='Confirmed'&&a.cid?` <button class="btn sm ghost" onclick="remind('${a.id}')">Send SMS reminder</button>`:''}${['Pending Payment','Pending Verification','Confirmed'].includes(a.status)?` <button class="btn sm ghost" onclick="cancelAppt('${a.id}')">Cancel</button>`:''}</td></tr>`).join('')}</table></div></section>`+walkPanel()+reportPanel()}
+   ${all.map(a=>`<tr><td>${when(a)}</td><td>${esc(thr(a.th).name)}</td><td>${esc(a.who)}${a.addr?'<br><small>Home service: '+esc(a.addr)+'</small>':''}</td><td>${esc(svc(a.svc).name)}</td><td>${pill(a.status)}${a.status==='Confirmed'&&a.cid?` <button class="btn sm ghost" onclick="remind('${a.id}')">Send SMS reminder</button>`:''}${['Pending Payment','Pending Verification','Confirmed'].includes(a.status)?` <button class="btn sm ghost" onclick="cancelAppt('${a.id}')">Cancel</button>`:''}</td></tr>`).join('')}</table></div></section>`+walkPanel()+reportPanel()}
 function therapist(){
   const me=thr(S.thView),mine=D.appointments.filter(a=>a.th===S.thView&&['Confirmed','Completed'].includes(a.status)).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
   return `<h1>My schedule</h1><p class="lead">Therapists see only their own confirmed appointments.</p>
   <section class="panel"><b>${esc(me.name)}</b><p class="empty">${esc(me.spec)}</p>
-  <div style="margin-top:16px">${mine.length?mine.map(a=>`<div class="row"><div><b>${dayLabel(a.date)} · ${a.time}</b><p>${esc(a.who)} · ${esc(svc(a.svc).name)}</p></div>
+  <div style="margin-top:16px">${mine.length?mine.map(a=>`<div class="row"><div><b>${when(a)}</b><p>${esc(a.who)} · ${esc(svc(a.svc).name)}</p>${a.addr?`<p>Home service: ${esc(a.addr)}</p>`:''}</div>
    <div>${a.status==='Confirmed'?`<button class="btn sm" onclick="complete('${a.id}')">Mark completed</button>`:pill('Completed')}</div></div>`).join(''):'<p class="empty">No confirmed appointments yet.</p>'}</div></section>`}
 function accPanel(){
   const us=D.users.filter(a=>a.role!=='client');
@@ -549,13 +601,16 @@ function accPanel(){
 function admin(){
   const st=D.settings;
   return `<h1>Administration</h1><p class="lead">Manage services and therapists, set the booking policy, and review who did what.</p>
-  <div class="grid"><div><section class="panel"><h2>Services</h2>${D.services.map(x=>`<div class="row"><div><b>${esc(x.name)}</b><p>${x.mins} min · ₱${x.price}${x.on===false?' · inactive':''}</p></div><button class="btn sm ghost" onclick="flipSvc('${x.id}')">${x.on===false?'Set active':'Set inactive'}</button></div>`).join('')||`<p class="empty">No services yet. <button class="link" onclick="loadSample()">Load sample services and therapists</button></p>`}
+  <div class="grid"><div><section class="panel"><h2>Services</h2>${D.services.map(x=>S.edit&&S.edit.k==='svc'&&S.edit.id===x.id?`<div class="row" style="display:block"><label for="en">Name</label><input type="text" id="en" value="${esc(x.name)}"><div class="tools" style="margin:8px 0"><input type="number" id="em" value="${x.mins}" aria-label="Minutes" style="flex:1"><input type="number" id="ep" value="${x.price}" aria-label="Price" style="flex:1"><input type="number" id="epr" value="${x.promo||''}" placeholder="Early bird ₱" aria-label="Early bird price" style="flex:1"></div><input type="text" id="ec" value="${esc(x.cat||'')}" placeholder="Group, e.g. Massage or Combo Package"><div class="tools" style="margin-top:8px"><button class="btn sm" onclick="saveSvc('${x.id}')">Save</button><button class="btn sm ghost" onclick="editOff()">Cancel</button></div></div>`:`<div class="row"><div><b>${esc(x.name)}</b><p>${fmtMins(x.mins)} · ${x.price>0?'₱'+x.price:'price not set yet'}${x.home?' · home service':''}${x.promo?' · early bird ₱'+x.promo:''}${x.cat?' · '+esc(x.cat):''}${x.on===false?' · inactive':''}</p></div><div class="tools"><button class="btn sm ghost" onclick="editOn('svc','${x.id}')">Edit</button><button class="btn sm ghost" onclick="flipSvc('${x.id}')">${x.on===false?'Set active':'Set inactive'}</button></div></div>`).join('')||`<p class="empty">No services yet.</p>`}${(()=>{const g=menuGap();return g.svc.length||g.th.length||g.off.length?`<p class="note"><button class="link" onclick="loadMenu()">Add ${g.svc.length} missing menu items and ${g.th.length} missing therapists${g.off.length?', and set the printed days off for '+g.off.length+' therapists':''}</button></p>`:''})()}
    <label for="sn">Add a service</label><input type="text" id="sn" placeholder="Service name"><div class="tools" style="margin:8px 0"><input type="number" id="sm" placeholder="Minutes" style="flex:1"><input type="number" id="sp" placeholder="Price (₱)" style="flex:1"></div>
    <button class="btn sm" onclick="addSvc()">Add service</button></section>
   <section class="panel gap"><h2>Booking policy</h2><label for="hm">Client has this long to send payment proof (minutes)</label><input type="number" id="hm" value="${st.holdMin}"><label for="co">Client can cancel or reschedule up to (hours before)</label><input type="number" id="co" value="${st.cutoffH}">
    <label for="vh">Staff must verify within (hours, 0 = no limit)</label><input type="number" id="vh" value="${st.verifyH||0}">
+   <label for="to">Opening time</label><input type="time" id="to" value="${st.open}"><label for="tc">Last start time (last client accepted)</label><input type="time" id="tc" value="${st.lastStart}">
+   <label for="ef">Early bird: sessions start from</label><input type="time" id="ef" value="${st.earlyFrom}"><label for="et">Early bird: sessions must finish by</label><input type="time" id="et" value="${st.earlyTo}">
+   <label for="tr">Home service travel time, each way (minutes)</label><input type="number" id="tr" value="${st.travelMin||0}"><p class="note">The early bird price applies Monday to Friday. A session that started by the last start time may finish after closing. Changing these does not cancel bookings that already exist.</p>
    <div class="tools" style="margin-top:12px"><button class="btn sm" onclick="saveSettings()">Save policy</button></div></section></div>
-  <div><section class="panel"><h2>Therapists</h2>${D.therapists.map(t=>`<div class="row"><div><b>${esc(t.name)}</b><p>${esc(t.spec)}${t.on?'':' · inactive'}</p></div><button class="btn sm ghost" onclick="flip('${t.id}')">${t.on?'Set inactive':'Set active'}</button></div>`).join('')||'<p class="empty">No therapists yet.</p>'}
+  <div><section class="panel"><h2>Therapists</h2>${D.therapists.map(t=>S.edit&&S.edit.k==='th'&&S.edit.id===t.id?`<div class="row" style="display:block"><label for="etn">Name</label><input type="text" id="etn" value="${esc(t.name)}"><label for="ets">Specialty</label><input type="text" id="ets" value="${esc(t.spec||'')}"><label>Weekly day off</label><div class="chips" id="eoff">${DAYN.map((d,i)=>`<label class="chip" style="display:inline-flex;gap:6px;align-items:center;margin:0"><input type="checkbox" value="${i}" ${(t.off||[]).includes(i)?'checked':''}> ${d}</label>`).join('')}</div><label for="etp">Photo (optional)</label><input type="file" id="etp" accept="image/*"><div class="tools" style="margin-top:8px"><button class="btn sm" onclick="saveTh('${t.id}')">Save</button><button class="btn sm ghost" onclick="editOff()">Cancel</button></div></div>`:`<div class="row"><div style="display:flex;gap:10px;align-items:center">${t.photo?`<img src="${esc(t.photo)}" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover">`:''}<div><b>${esc(t.name)}</b><p>${esc(t.spec||'No specialty set')}${(t.off||[]).length?' · Day off: '+t.off.map(i=>DAYN[i]).join(', '):''}${t.on?'':' · inactive'}</p></div></div><div class="tools"><button class="btn sm ghost" onclick="editOn('th','${t.id}')">Edit</button><button class="btn sm ghost" onclick="flip('${t.id}')">${t.on?'Set inactive':'Set active'}</button></div></div>`).join('')||'<p class="empty">No therapists yet.</p>'}
    <label for="tn">Add a therapist</label><div class="tools" style="margin:0 0 8px"><input type="text" id="tn" placeholder="Name" style="flex:1"><input type="text" id="ts" placeholder="Specialty" style="flex:1"></div><button class="btn sm" onclick="addTh()">Add therapist</button></section>
   <section class="panel gap"><h2>Audit log</h2>${D.log.length?D.log.map(l=>`<div class="row"><div>${esc(l.a)}<p>${fmt(l.at)} · ${esc(l.by||'')} (${esc(l.role)})</p></div></div>`).join(''):'<p class="empty">Approvals, rejections, and other changes are recorded here.</p>'}</section></div></div>`+accPanel()+
   `<section class="panel gap"><h2>Backup</h2><p class="empty">Download a copy of all bookings, services, therapists, and settings.</p><div class="tools" style="margin-top:10px"><button class="btn sm" onclick="backup()">Download backup (JSON)</button>
