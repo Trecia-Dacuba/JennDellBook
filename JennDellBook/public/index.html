@@ -272,7 +272,7 @@ async function shrink(file,small,max){
    Same interface as the Firebase adapter, so the app code never changes.
    ===================================================================== */
 const COLS=['users','services','therapists','appointments','slots','notes','log','settings'];
-const LKEY='jendellbook.db.v1';
+const LKEY='jendellbook.db.v2';
 let memStore=null;                                    // used only if browser storage is blocked
 const store={get(){try{return localStorage.getItem(LKEY)}catch(e){return memStore}},set(v){try{localStorage.setItem(LKEY,v)}catch(e){memStore=v}},clear(){try{localStorage.removeItem(LKEY)}catch(e){}memStore=null}};
 async function sha(s){
@@ -291,19 +291,18 @@ const Local={
     D.settings={...DEFAULTS,...(db.settings.main||{})};if(!silent)this.cb()},
   async seed(){
     const db={};COLS.forEach(c=>db[c]={});
-    db.services={s1:{name:'Swedish massage',mins:60,price:700,on:true},s2:{name:'Deep tissue massage',mins:60,price:850,on:true},s3:{name:'Hot stone therapy',mins:90,price:1200,on:true}};
-    db.therapists={t1:{name:'Marites',spec:'Swedish, aromatherapy',on:true},t2:{name:'Joyce',spec:'Deep tissue, sports',on:true},t3:{name:'Lorna',spec:'Hot stone',on:true}};
+    MENU.forEach((m,i)=>{db.services['s'+(i+1)]={name:m.name,mins:m.mins,price:m.price,cat:m.cat,promo:m.promo||null,home:!!m.home,on:m.on!==false}});
+    THERAPISTS.forEach((t,i)=>{db.therapists['t'+(i+1)]={name:t.name,spec:'',off:t.off,on:true}});
     const mk=async(id,email,pw,name,role,extra)=>{const salt=uid();db.users[id]={email,name,role,salt,hash:await sha(salt+pw),...extra}};
     await mk('u1','demo@client.ph','client123','Maria Santos','client',{phone:'0917 000 0000'});
     await mk('u2','staff@jendell.ph','staff123','Front Desk','staff');
     await mk('u3','admin@jendell.ph','admin123','Owner','admin');
-    await mk('u4','marites@jendell.ph','therapist123','Marites','therapist',{thId:'t1'});
-    await mk('u5','joyce@jendell.ph','therapist123','Joyce','therapist',{thId:'t2'});
-    await mk('u6','lorna@jendell.ph','therapist123','Lorna','therapist',{thId:'t3'});
-    const today=dkey(new Date()),seedAppt=(id,who,sv,th,time)=>{const ids=units(th,today,time,60);
-      db.appointments[id]={who,cid:null,ph:'',svc:sv,th,date:today,time,slots:ids,price:700,status:'Confirmed',holdUntil:null,proofs:[{ref:'GC'+id,file:'seed.png',url:'',st:'Verified'}],created:Date.now()};
+    for(const [i,t] of THERAPISTS.entries())await mk('u'+(4+i),t.name.split(' ')[0].toLowerCase()+'@jendell.ph','therapist123',t.name,'therapist',{thId:'t'+(i+1)});
+    const today=dkey(new Date()),seedAppt=(id,who,sv,th,time,price)=>{const ids=units(th,today,time,60);
+      db.appointments[id]={who,cid:null,ph:'',svc:sv,th,date:today,time,slots:ids,price,status:'Confirmed',holdUntil:null,proofs:[{ref:'GC'+id,file:'seed.png',url:'',st:'Verified'}],created:Date.now()};
       ids.forEach(s=>{db.slots[s]={apptId:id,th,date:today,holdUntil:null}})};
-    seedAppt('a1','Ana R.','s2','t2','11:00');seedAppt('a2','Ben L.','s1','t1','13:00');
+    const sv=n=>'s'+(MENU.findIndex(m=>m.name===n)+1),th=n=>'t'+(THERAPISTS.findIndex(t=>t.name.startsWith(n))+1);
+    seedAppt('a1','Ana R.',sv('Deep Tissue Massage'),th('Karl'),'11:00',450);seedAppt('a2','Ben L.',sv('Swedish Massage'),th('Tata'),'13:00',450);
     db.settings.main={...DEFAULTS};this.save(db)},
   save(db){store.set(JSON.stringify(db))},
   async reset(){store.clear();await this.seed();this.pull()},
@@ -462,7 +461,7 @@ function auth(){
   const login=`<label for="le">Email</label><input type="email" id="le" autocomplete="username" ${ent('logIn')}>
    <label for="lw">Password</label><input type="password" id="lw" autocomplete="current-password" ${ent('logIn')}>
    <div class="tools" style="margin-top:18px"><button class="btn" style="width:100%" onclick="logIn()">Log in</button></div>
-   ${c?'<p class="note">New here? <button class="link" onclick="setReg(true)">Create an account</button></p>'+(demo?'<p class="note">Sample login: demo@client.ph / client123</p>':''):(demo?'<p class="note">Demo logins: staff@jendell.ph / staff123 · marites@jendell.ph / therapist123 · admin@jendell.ph / admin123</p>':'<p class="note">Staff accounts are created by the owner.</p>')}`;
+   ${c?'<p class="note">New here? <button class="link" onclick="setReg(true)">Create an account</button></p>'+(demo?'<p class="note">Sample login: demo@client.ph / client123</p>':''):(demo?'<p class="note">Demo logins: staff@jendell.ph / staff123 · delia@jendell.ph / therapist123 · admin@jendell.ph / admin123</p>':'<p class="note">Staff accounts are created by the owner.</p>')}`;
   const signup=`<label for="an">Full name</label><input type="text" id="an" autocomplete="name">
    <label for="ap">Mobile number</label><input type="tel" id="ap" autocomplete="tel" placeholder="09XX XXX XXXX, for SMS updates">
    <label for="ae">Email</label><input type="email" id="ae" autocomplete="email">
@@ -624,26 +623,34 @@ const addStaff=run(async()=>{const n=$('#sn2').value.trim(),e=$('#se').value.tri
   await DB.set('log',uid(),logDoc('Created '+r+' account for '+n));toast('Account created. They can log in from the Staff tab.')});
 const delAcc=run(async id=>{const u=D.users.find(x=>x.id===id);await DB.del('users',id);await DB.set('log',uid(),logDoc('Removed account '+(u?u.email:id)))});
 const M=(cat,name,mins,price,extra)=>({cat,name,mins,price,...extra});
+/* Services and prices come from JENDELL's "UPDATED Price List". Durations come from the spa's menu flier.
+   Items marked on:false have a price but no duration yet: set the minutes in Administration, then set them active. */
+const FM='Female Therapist to Male Client';
 const MENU=[
  M('Massage','Full Body Massage w/ Hot Compress (Combination)',60,450),M('Massage','Swedish Massage',60,450),M('Massage','Deep Tissue Massage',60,450),
- M('Massage','Therapeutic Massage w/ Hilot',90,550),M('Massage','Reflexology',60,450),M('Massage','Hilot (Pilay, Ipit Ugat, Lagnat, Taas Matres)',20,300),
- M('Massage','Back Massage',20,300),M('Massage','Back Massage w/ Hotstone or Ventosa',45,400),M('Massage','Half Body (Lying)',30,400),
- M('Massage','Half Body w/ Ventosa or Hotstone',60,450),M('Massage','Foot Massage',30,350),M('Massage','Baby Massage (5 years old below)',30,275),
+ M('Massage','Reflexology',60,450),M('Massage','Therapeutic Massage w/ Hilot',90,550),M('Massage','Hilot (Pilay, Ipit Ugat, Lagnat, Taas Matres)',20,300),
+ M('Massage','Back Massage',20,300),M('Massage','Half Body (Lying / Back)',30,400),M('Massage','Half Body w/ Ventosa or Hotstone',60,450),
+ M('Massage','Foot and Hand Massage',30,350),M('Massage','Baby Massage (5 years old below)',30,275),
  M('Massage','Full Body Massage, Young Adult (6 to 12 yrs old)',60,400),
+ M('Massage','Clinical Hilot',60,720,{on:false}),M('Massage','Clinical / Therapeutic Massage',60,1320,{on:false}),M('Massage','Bone Setting',60,2000,{on:false}),
  M('Combo Package','Full Body Massage w/ Hotstone or Ventosa',90,550,{promo:450}),M('Combo Package','Full Body Massage w/ Ear Candling',75,550),
  M('Combo Package','Full Body Massage w/ Scanning Ventosa',90,550),M('Combo Package','Foot Scrub w/ Foot Massage',30,550),
- M('Combo Package','Therapeutic w/ Ventosa or Hotstone',90,700),M('Combo Package','Steam Sauna',105,800),M('Combo Package','Body Scrub',105,850),
- M('Other','Steam Inhalation (Suob)',30,0,{on:false}),                         // price and time to be set by the owner, then activate
- M('Home Service','Home Service (1 hour)',60,750,{home:true})];
-const THERAPISTS=['Ella','Delia','Cha','Lanny','Karl','Tata','Klent'];
-const DAYOFF={Ella:[1],Delia:[2],Klent:[2],Lanny:[3],Cha:[4]};   // from the spa's printed "Schedule of Day Off" (0 = Sunday ... 6 = Saturday); Klent takes the Tuesday slot
-const menuGap=()=>({svc:MENU.filter(m=>!D.services.some(x=>x.name===m.name)),th:THERAPISTS.filter(n=>!D.therapists.some(t=>t.name===n)),off:D.therapists.filter(t=>DAYOFF[t.name]&&!(t.off||[]).length)});
+ M('Combo Package','Therapeutic Massage w/ Ventosa or Hotstone',90,700),M('Combo Package','Steam Sauna',105,800),M('Combo Package','Body Scrub',105,850),
+ M('Combo Package','Steam Inhalation (Suob)',30,550),M('Combo Package','Super Package (Full Body w/ Scrub, Sauna)',105,1000),
+ M('Home Service','Home Service (1 hour)',60,750,{home:true}),M('Home Service','Home Service (1 hour 30 mins)',90,900,{home:true}),
+ M(FM,'Full Body Massage',60,600),M(FM,'Full Body Massage w/ Stone or Ventosa',90,700),M(FM,'Therapeutic Massage',90,800),
+ M(FM,'Therapeutic Massage w/ Stone or Ventosa',90,850),M(FM,'Super Package Full Body w/ Stone or Ventosa, Sauna / Body Scrub',105,1100),
+ M(FM,'Steam Sauna Full w/ Stone or Ventosa',105,900),M(FM,'Therapeutic Massage, Clinical',60,1920,{on:false})];
+/* JENDELL therapists. "off" is the weekly day off from the spa's printed "Schedule of Day Off" (0 = Sunday ... 6 = Saturday). Karl and Tata have none. */
+const THERAPISTS=[{name:'Delia Dacuba',off:[2]},{name:'Lhanny Gonzales',off:[3]},{name:'Ella Lanada',off:[1]},{name:'Cha Bioco',off:[4]},{name:'Karl Dolores',off:[]},{name:'Klent Cavan',off:[2]},{name:'Tata Bioco',off:[]}];
+const offFor=name=>(THERAPISTS.find(t=>t.name===name)||{off:[]}).off;
+const menuGap=()=>({svc:MENU.filter(m=>!D.services.some(x=>x.name===m.name)),th:THERAPISTS.filter(t=>!D.therapists.some(x=>x.name===t.name)),off:D.therapists.filter(t=>offFor(t.name).length&&!(t.off||[]).length)});
 const loadMenu=run(async()=>{
   const g=menuGap();if(!g.svc.length&&!g.th.length&&!g.off.length)return toast('The menu is already complete.');
   if(!confirm('Add '+g.svc.length+' services and '+g.th.length+' therapists, and set '+g.off.length+' existing days off?'))return;
   for(const m of g.svc)await DB.set('services',uid(),{name:m.name,mins:m.mins,price:m.price,cat:m.cat,promo:m.promo||null,home:!!m.home,on:m.on!==false});
-  for(const n of g.th)await DB.set('therapists',uid(),{name:n,spec:'',off:DAYOFF[n]||[],on:true});
-  for(const t of g.off)await DB.update('therapists',t.id,{off:DAYOFF[t.name]});
+  for(const t of g.th)await DB.set('therapists',uid(),{name:t.name,spec:'',off:t.off,on:true});
+  for(const t of g.off)await DB.update('therapists',t.id,{off:offFor(t.name)});
   if(!D.services.length)await DB.set('settings','main',{...DEFAULTS});
   await DB.set('log',uid(),logDoc('Loaded menu items: '+g.svc.length+' services, '+g.th.length+' therapists'));toast('JENDELL menu updated.')});
 const backup=run(async()=>{download('jendellbook-backup-'+dkey(new Date())+'.json',JSON.stringify(await DB.exportAll(),null,1),'application/json');toast('Backup downloaded.')});
@@ -683,6 +690,7 @@ function client(){
    <label>Time</label><div class="chips">${chipsTime(s.th,s.day,s.time,svc(s.svc),'pick',S.resch)}</div>${offNote(s.th,s.day)}
    ${svc(s.svc).home?`<label for="addr">Home address (where the therapist should go)</label><input type="text" id="addr" autocomplete="street-address" placeholder="House no., street, barangay, city">`:''}
    <p class="note">Struck-through times are already booked or have passed. This service takes ${fmtMins(m)}.${svc(s.svc).promo?' Early bird price ₱'+svc(s.svc).promo+' for sessions that start from '+D.settings.earlyFrom+' and finish by '+D.settings.earlyTo+', Monday to Friday.':''}${s.time?' <b>Price for '+s.time+': ₱'+priceAt(svc(s.svc),s.day,s.time)+(priceAt(svc(s.svc),s.day,s.time)<svc(s.svc).price?' (early bird)':'')+'</b>':''}</p>
+   <p class="note">Need more time? Add 30 minutes for ₱200 on 1-hour services, or ₱350 on Therapeutic Massage. Please tell your therapist at the spa.</p>
    <div class="tools"><button class="btn" onclick="book()">${S.resch?'Move booking':'Hold this slot'}</button>${S.resch?'<button class="btn ghost" onclick="cancelResch()">Keep original time</button>':''}</div>
    ${DB.mode==='local'?`<label style="font-weight:400"><input type="checkbox" ${S.race?'checked':''} onchange="S.race=this.checked"> Test the conflict check: let another client grab the chosen slot first</label>`:''}`;
   return head('Hi, '+esc(S.user.name.split(' ')[0])+'. Book a massage','Pick a service, therapist, and time. Your slot is held for '+D.settings.holdMin+' minutes while you send the ₱100 reservation fee through GCash. Once your proof is in, the timer stops until staff verify it.')+
