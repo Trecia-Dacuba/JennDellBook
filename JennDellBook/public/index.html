@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14403d">
+<title>JendellBook · JENDELL Massage and Spa</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='12' fill='%232c7a6a'/%3E%3Cpath d='M20 9c3.200 3.600 4.800 7.200 4.800 10.800 0 3.200-1.800 5.600-4.800 7-3-1.400-4.800-3.800-4.800-7C15.200 16.200 16.800 12.600 20 9z' fill='%23fff'/%3E%3Cpath d='M11 17c3.400.4 6 2 7.600 4.600-.4 3.200-2.400 5.400-5.800 6.200-2.400-1.800-3.400-4.600-3-7.400.2-1.200.6-2.200 1.200-3.400zM29 17c-3.400.4-6 2-7.600 4.600.4 3.200 2.400 5.400 5.800 6.200 2.400-1.800 3.400-4.600 3-7.400-.2-1.200-.6-2.200-1.200-3.400z' fill='%23fff' fill-opacity='.7'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,700;1,500&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef3f0;--surface:#fff;--ink:#15303a;--muted:#566b72;--line:#d3ddd9;--jade:#2c7a6a;--jade-d:#1f5c50;--on-jade:#fff;--gold:#946414;--gold-l:#f3d9a4;--bad:#a8402f;--chip:#e3ece8;
+--glass:rgba(255,255,255,.88);--shadow:0 1px 2px rgba(21,48,58,.06),0 12px 32px -14px rgba(21,48,58,.22);
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1a1f;--surface:#17292f;--ink:#e6efec;--muted:#9bb0b0;--line:#2a4046;--jade:#4fb39d;--jade-d:#7fd0bd;--on-jade:#0f1d22;--gold:#e0b25a;--bad:#e8806e;--chip:#1f363d;--glass:rgba(23,41,47,.88);--shadow:0 1px 2px rgba(0,0,0,.3),0 14px 34px -14px rgba(0,0,0,.65);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0d1a1f;--surface:#17292f;--ink:#e6efec;--muted:#9bb0b0;--line:#2a4046;--jade:#4fb39d;--jade-d:#7fd0bd;--on-jade:#0f1d22;--gold:#e0b25a;--bad:#e8806e;--chip:#1f363d;--glass:rgba(23,41,47,.88);--shadow:0 1px 2px rgba(0,0,0,.3),0 14px 34px -14px rgba(0,0,0,.65);color-scheme:dark}
+html{scroll-padding-top:calc(80px + env(safe-area-inset-top,0px));scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:flex;flex-direction:column;color:var(--ink);font:16px/1.55 "DM Sans",system-ui,sans-serif;background-color:var(--bg);
+ background-image:radial-gradient(900px 520px at 6% -8%,color-mix(in srgb,var(--jade) 16%,transparent),transparent 62%),radial-gradient(760px 460px at 100% 0,color-mix(in srgb,var(--gold) 13%,transparent),transparent 60%);background-attachment:fixed}
+main{flex:1;width:100%;max-width:1100px;margin:0 auto;padding:28px max(20px,5vw) 72px}
+h1{font:700 30px/1.15 Fraunces,Georgia,serif;margin:0 0 6px;letter-spacing:-.01em}
+h2{font:700 20px/1.2 Fraunces,Georgia,serif;margin:0 0 12px}
+h3{font:700 15px Fraunces,Georgia,serif;margin:18px 0 6px}
+.lead{color:var(--muted);margin:0 0 24px;max-width:60ch}
+
+/* ---------- header ---------- */
+header{position:sticky;top:0;z-index:10;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:12px max(20px,5vw);background:var(--glass);border-bottom:1px solid var(--line);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4)}
+.brand{display:flex;gap:12px;align-items:center}
+.logo{width:40px;height:40px;flex:none;filter:drop-shadow(0 6px 10px rgba(31,92,80,.35))}
+.bn{display:block;font:700 23px/1 Fraunces,Georgia,serif;letter-spacing:-.01em}
+.brand small{display:block;font:400 12.5px "DM Sans",sans-serif;color:var(--muted);margin-top:4px;letter-spacing:.01em}
+.hright{display:flex;gap:10px;align-items:center}
+.who{display:flex;gap:10px;align-items:center;font-size:14px}
+.who .wn{display:flex;flex-direction:column;line-height:1.2;font-weight:700}
+.who .wn small{font-weight:400;color:var(--muted);text-transform:capitalize}
+.avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--jade),var(--jade-d));color:var(--on-jade);display:grid;place-items:center;font:700 16px Fraunces,Georgia,serif}
+.icon-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);display:grid;place-items:center;cursor:pointer;transition:transform .15s,border-color .15s}
+.icon-btn:hover{border-color:var(--jade);transform:translateY(-1px)}
+.icon-btn svg{width:18px;height:18px}
+
+/* ---------- panels, forms ---------- */
+.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px;align-items:start}
+@media(max-width:760px){.grid{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:var(--shadow)}
+.panel.gap{margin-top:20px}
+label{display:block;font-weight:500;font-size:14px;margin:14px 0 6px}
+select,input[type=time],input[type=text],input[type=number],input[type=password],input[type=email],input[type=tel]{width:100%;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;transition:border-color .15s,box-shadow .15s}
+select:hover,input:hover{border-color:color-mix(in srgb,var(--jade) 45%,var(--line))}
+select:focus,input:focus{outline:0;border-color:var(--jade);box-shadow:0 0 0 4px color-mix(in srgb,var(--jade) 22%,transparent)}
+input[type=file]{font-size:14px;max-width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:999px;font:inherit;font-size:14px;cursor:pointer;transition:background .15s,border-color .15s,transform .15s}
+.chip:hover:not(:disabled){border-color:var(--jade);transform:translateY(-1px)}
+.chip[aria-pressed="true"]{background:var(--jade);color:var(--on-jade);border-color:var(--jade);box-shadow:0 6px 14px -8px var(--jade)}
+.chip:disabled{opacity:.38;text-decoration:line-through;cursor:not-allowed}
+.btn{background:var(--jade);color:var(--on-jade);border:0;padding:12px 20px;border-radius:10px;font:700 15px/1.1 "DM Sans",system-ui,sans-serif;cursor:pointer;box-shadow:0 10px 20px -12px var(--jade);transition:transform .15s,filter .15s,box-shadow .15s}
+.btn:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.07)}
+.btn:active:not(:disabled){transform:translateY(0)}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+.btn.ghost:hover:not(:disabled){border-color:var(--jade);filter:none}
+.btn.bad{background:var(--bad);color:#fff;box-shadow:0 10px 20px -12px var(--bad)}
+.btn.sm{padding:8px 13px;font-size:13px;border-radius:9px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:15px 0;border-top:1px solid var(--line)}
+.row:first-of-type{border-top:0;padding-top:0}
+.row p{margin:2px 0;color:var(--muted);font-size:14px}
+.row b{font-weight:700}
+.pill{display:inline-block;padding:3px 11px;border-radius:999px;font-size:12px;font-weight:700;background:var(--chip);white-space:nowrap}
+.pill::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:currentColor;margin-right:6px;vertical-align:middle;opacity:.75}
+.pill.Confirmed,.pill.Completed{background:var(--jade);color:var(--on-jade)}
+.pill.Rejected,.pill.Cancelled{background:var(--bad);color:#fff}
+.pill.Pending{background:var(--gold);color:#fff}
+.empty{color:var(--muted);font-size:14px;margin:0}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:10px 8px;border-top:1px solid var(--line)}
+th{font-weight:700;border-top:0;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+tr:hover td{background:color-mix(in srgb,var(--jade) 5%,transparent)}
+.scroll{overflow-x:auto}
+.proof{background:color-mix(in srgb,var(--gold) 9%,var(--bg));border:1px dashed color-mix(in srgb,var(--gold) 55%,var(--line));border-radius:12px;padding:14px;margin-top:10px}
+.note{font-size:13px;color:var(--muted);margin-top:10px}
+.seg{display:flex;gap:4px;background:var(--chip);padding:4px;border-radius:12px;margin-bottom:6px}
+.seg button{flex:1;border:0;background:none;color:var(--muted);padding:10px;border-radius:9px;font-weight:500;font-size:14px;font-family:inherit;cursor:pointer;transition:background .15s,color .15s}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 1px var(--line)}
+.bar{height:8px;border-radius:4px;background:linear-gradient(90deg,var(--jade),color-mix(in srgb,var(--jade) 55%,#fff));min-width:2px}
+.hold{color:var(--gold);font-weight:700}
+.tag{font-size:13px;color:var(--bad);font-weight:700}
+.link{background:none;border:0;color:var(--jade);font:inherit;font-weight:700;cursor:pointer;padding:0;text-decoration:underline}
+.banner{background:var(--chip);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--muted);margin-bottom:20px}
+.banner.ok{border-color:var(--jade);color:var(--ink)}
+.banner.err{border-color:var(--bad);color:var(--bad)}
+.prof{display:flex;gap:12px;align-items:center;margin-top:10px}.prof img,.ini{width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid var(--surface);box-shadow:0 0 0 2px var(--jade)}.ini{background:var(--chip);display:grid;place-items:center;font:700 22px Fraunces,Georgia,serif}
+.thumb{display:block;max-width:150px;max-height:110px;border-radius:8px;border:1px solid var(--line);margin-top:8px;cursor:zoom-in}
+
+/* ---------- dashboards: page head, steps, stats ---------- */
+.pagehead{position:relative;overflow:hidden;border-radius:22px;padding:28px 30px;margin-bottom:22px;color:#fff;background:linear-gradient(120deg,#143e38,#2c7a6a 62%,#58b8a2);box-shadow:var(--shadow)}
+.pagehead::before{content:"";position:absolute;right:-60px;top:-80px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(246,210,138,.55),rgba(246,210,138,0) 68%)}
+.pagehead::after{content:"";position:absolute;right:-40px;bottom:-110px;width:320px;height:320px;border-radius:50%;background:repeating-radial-gradient(circle,rgba(255,255,255,.14) 0 2px,transparent 2px 22px)}
+.pagehead>*{position:relative;z-index:1}
+.pagehead h1{color:#fff;margin:0 0 6px}
+.pagehead .lead{color:rgba(255,255,255,.9);margin:0;max-width:62ch}
+.steps{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:0;margin:0 0 22px}
+.steps li{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:14px;box-shadow:var(--shadow)}
+.steps .n{flex:none;width:32px;height:32px;border-radius:50%;background:var(--chip);color:var(--jade-d);display:grid;place-items:center;font:700 15px Fraunces,Georgia,serif}
+@media(max-width:760px){.steps{grid-template-columns:1fr}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:0 0 22px}
+.stat{position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)}
+.stat b{display:block;font:700 32px/1 Fraunces,Georgia,serif;color:var(--jade-d);margin-bottom:6px}
+.stat span{font-size:13px;color:var(--muted)}
+.stat::after{content:"";position:absolute;right:-20px;top:-20px;width:76px;height:76px;border-radius:50%;background:color-mix(in srgb,var(--jade) 12%,transparent)}
+.stat.alert b{color:var(--gold)}
+.stat.alert::after{background:color-mix(in srgb,var(--gold) 18%,transparent)}
+
+/* ---------- login / landing ---------- */
+body.is-auth header{position:absolute;left:0;right:0;background:transparent;border:0;backdrop-filter:none;-webkit-backdrop-filter:none}
+body.is-auth .bn{color:#fff}
+body.is-auth .brand small{color:rgba(255,255,255,.78)}
+body.is-auth .icon-btn{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.3);color:#fff}
+body.is-auth main{max-width:none;padding:0}
+body.is-auth footer{display:none}
+body.is-auth .banner{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:6;margin:0;max-width:min(92vw,720px);background:rgba(8,28,30,.55);border-color:rgba(255,255,255,.28);color:rgba(255,255,255,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+body.is-auth .banner .link{color:var(--gold-l)}
+.landing{position:relative;isolation:isolate;min-height:100vh;min-height:100dvh;display:flex;align-items:center;overflow:hidden}
+.scene{position:absolute;inset:0;z-index:-1;background:#0b2326}
+.scene svg,.scene .photo{position:absolute;inset:0;width:100%;height:100%}
+/* To use your own photo, save it as public/images/login-bg.jpg. It is laid over the illustration below. */
+.scene .photo{background:url("images/login-bg.jpg") center/cover no-repeat}
+.scene::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,rgba(7,24,26,.84) 0%,rgba(7,24,26,.58) 46%,rgba(7,24,26,.22) 100%)}
+.landing-in{width:100%;max-width:1160px;margin:0 auto;padding:112px max(20px,5vw) 72px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:56px;align-items:center}
+@media(max-width:860px){.landing-in{grid-template-columns:1fr;gap:30px;padding-top:100px}.hero .perks{display:none}}
+.hero{color:#fff;animation:rise .7s both}
+.kicker{display:inline-flex;gap:10px;align-items:center;font-size:12.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-l);font-weight:700}
+.kicker::before{content:"";width:30px;height:1px;background:var(--gold-l)}
+.hero h2{font:700 clamp(36px,5.4vw,62px)/1.04 Fraunces,Georgia,serif;margin:16px 0 18px;color:#fff;letter-spacing:-.02em}
+.hero h2 em{font-style:italic;font-weight:500;color:var(--gold-l)}
+.hero .sub{font-size:18px;color:rgba(255,255,255,.84);max-width:46ch;margin:0 0 28px}
+.perks{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+.perks li{display:flex;gap:14px;align-items:flex-start;color:rgba(255,255,255,.82);font-size:14.5px;line-height:1.45}
+.perks b{display:block;color:#fff;font-size:15.5px}
+.pi{flex:none;width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.24);color:var(--gold-l);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.auth{width:100%;max-width:440px;margin:0 0 0 auto;animation:rise .7s .12s both}
+@media(max-width:860px){.auth{margin:0 auto}}
+.card-auth{background:var(--glass);border:1px solid rgba(255,255,255,.4);border-radius:24px;padding:28px;backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3);box-shadow:0 34px 80px -24px rgba(0,0,0,.6)}
+.card-auth h1{font-size:28px}
+.card-auth .lead{margin:0 0 18px;font-size:15px}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- misc ---------- */
+footer{padding:22px max(20px,5vw) calc(26px + env(safe-area-inset-bottom,0px));text-align:center;color:var(--muted);font-size:13px;border-top:1px solid var(--line);background:color-mix(in srgb,var(--surface) 60%,transparent)}
+.loading{display:flex;gap:12px;align-items:center;justify-content:center;min-height:50vh;color:var(--muted)}
+.spin{width:22px;height:22px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--jade);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#lightbox{position:fixed;inset:0;background:rgba(0,0,0,.8);display:none;align-items:center;justify-content:center;padding:20px;cursor:zoom-out;z-index:20}
+#lightbox.on{display:flex}
+#lightbox img{max-width:100%;max-height:100%;border-radius:12px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,10px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:12px;font-size:14px;max-width:90vw;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:30;box-shadow:0 14px 34px -10px rgba(0,0,0,.5)}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media(prefers-reduced-motion:reduce){#toast,.chip,.btn,.icon-btn{transition:none}.hero,.auth{animation:none}.spin{animation-duration:2s}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3fa28f"/><stop offset="1" stop-color="#1f5c50"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#lg)"/><path d="M20 9c3.2 3.6 4.8 7.2 4.8 10.8 0 3.2-1.8 5.6-4.8 7-3-1.4-4.8-3.8-4.8-7C15.2 16.2 16.8 12.6 20 9z" fill="#fff"/><path d="M11 17c3.4.4 6 2 7.6 4.6-.4 3.2-2.4 5.4-5.8 6.2-2.4-1.8-3.4-4.6-3-7.4.2-1.2.6-2.2 1.2-3.4zM29 17c-3.4.4-6 2-7.6 4.6.4 3.2 2.4 5.4 5.8 6.2 2.4-1.8 3.4-4.6 3-7.4-.2-1.2-.6-2.2-1.2-3.4z" fill="#fff" fill-opacity=".72"/><path d="M9 31c3.6 2 7.4 3 11 3s7.4-1 11-3" stroke="#fff" stroke-opacity=".6" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+    <div><span class="bn">JendellBook</span><small>JENDELL Massage and Spa · online booking</small></div>
+  </div>
+  <div class="hright">
+    <div id="tabs" class="who"></div>
+    <button class="icon-btn" id="themeBtn" aria-label="Switch between light and dark mode" title="Light / dark mode" onclick="toggleTheme()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z"/></svg></button>
+  </div>
+</header>
+<main id="app"><div class="loading"><span class="spin"></span>Loading JendellBook…</div></main>
+<footer>© <span id="yr"></span> JENDELL Massage and Spa · JendellBook online booking and appointment system</footer>
+<div id="lightbox" role="dialog" aria-label="Payment screenshot" onclick="this.classList.remove('on')"><img alt="Payment screenshot"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+<noscript><p style="padding:24px;text-align:center">JendellBook needs JavaScript. Please turn it on in your browser.</p></noscript>
+<script src="firebase-config.js"></script>
+<script>
+/* =====================================================================
+   SETTINGS
+   DEMO MODE (data saved in this browser) runs when there is no firebase-config.js next to this file.
+   To use the real Firebase database, create public/firebase-config.js containing:
+   window.FIREBASE_CONFIG = {apiKey:"...",authDomain:"...",projectId:"...",storageBucket:"...",messagingSenderId:"...",appId:"..."};
+   ===================================================================== */
+const FIREBASE_CONFIG = window.FIREBASE_CONFIG || null;   // set in firebase-config.js (next to this file)
+/* Payment screenshots: false = keep a small compressed copy inside the booking record in Firestore (works on the free Spark plan).
+   true = use Firebase Cloud Storage (needs the Blaze pay-as-you-go plan, and storage.rules published). */
+const USE_CLOUD_STORAGE = false;
+
+/* ---------------------------------------------------------------------
+   Small helpers
+   --------------------------------------------------------------------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>'x'+Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+const pad=n=>String(n).padStart(2,'0');
+const dkey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());       // local date, not UTC
+const fmt=ms=>new Date(ms).toLocaleString('en-PH',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+const UNIT=15,STEP=30;                                    // a booking locks 15-minute units; start times are offered every 30 minutes
+const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m};
+const toHM=n=>pad(Math.floor(n/60))+':'+pad(n%60);
+const to12=t=>{const[h,m]=t.split(':').map(Number);return ((h%12)||12)+':'+pad(m)+' '+(h<12?'AM':'PM')};
+const fmtMins=m=>m<60?m+' min':Math.floor(m/60)+' hr'+(m%60?' '+m%60+' min':'');
+const LIVE=['Pending Payment','Pending Verification','Confirmed','Completed'];
+const DEFAULTS={holdMin:30,cutoffH:2,verifyH:0,open:'10:00',lastStart:'21:30',earlyFrom:'10:00',earlyTo:'15:00',travelMin:0};   // verifyH: 0 = no time limit for staff once proof is sent; travelMin: buffer each way for home service
+let _dc=null;
+function days(){const k=dkey(new Date());if(_dc&&_dc.k===k)return _dc.v;
+  const v=[...Array(7)].map((_,i)=>{const d=new Date();d.setDate(d.getDate()+i);return{key:dkey(d),label:d.toLocaleDateString('en-PH',{weekday:'short',month:'short',day:'numeric'})}});
+  _dc={k,v};return v}
+const dayLabel=k=>(days().find(d=>d.key===k)||{label:k}).label;
+const startMs=(date,time)=>{const[y,m,d]=date.split('-').map(Number),[h,i]=time.split(':').map(Number);return new Date(y,m-1,d,h,i).getTime()};
+const isPast=(date,time)=>startMs(date,time)<=Date.now();
+
+/* In-memory cache that the screens read from. The database adapters keep it live. */
+const D={users:[],services:[],therapists:[],appointments:[],slots:{},notes:[],log:[],settings:{...DEFAULTS}};
+const S={edit:null,user:null,mode:'client',reg:false,resch:null,ready:false,busy:false,fatal:null,race:false,thView:null,exp:new Set(),dirty:false,
+  walk:{svc:null,th:null,day:null,time:null,name:''},sel:{svc:null,th:null,day:null,time:null}};
+let DB=null;
+
+const svc=id=>D.services.find(x=>x.id===id)||{name:'—',mins:60,price:0};
+const thr=id=>D.therapists.find(x=>x.id===id)||{name:'—',spec:''};
+const pill=s=>`<span class="pill ${s.split(' ')[0]}">${s}</span>`;
+
+/* ---------------------------------------------------------------------
+   Slot locking = conflict detection.
+   Every hour a therapist works is a "slot" document with a deterministic id.
+   A booking must create ALL the slot documents it needs inside ONE
+   transaction; if any already exists (and is still live) the whole booking
+   is rejected. That is what makes double-booking impossible.
+   A 90-minute service locks two consecutive hours.
+   --------------------------------------------------------------------- */
+const slotId=(th,date,time)=>th+'_'+date+'_'+time.replace(':','');
+const units=(th,date,time,mins)=>{const s=toMin(time),n=Math.ceil(mins/UNIT);return Array.from({length:n},(_,k)=>slotId(th,date,toHM(s+k*UNIT)))};
+const DAYN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const wdayOf=date=>{const[y,m,d]=date.split('-').map(Number);return new Date(y,m-1,d).getDay()};
+const blk=sv=>sv&&sv.home?{pre:+D.settings.travelMin||0,post:+D.settings.travelMin||0}:{pre:0,post:0};
+function needed(th,date,time,sv){                      // the 15-minute units a booking must lock (home service adds travel time each way)
+  const b=blk(sv),t=toMin(time);if(t<toMin(D.settings.open)||t>toMin(D.settings.lastStart))return null;
+  const s0=t-b.pre,n=Math.ceil((sv.mins+b.pre+b.post)/UNIT);if(s0<0||s0+n*UNIT>1440)return null;
+  return units(th,date,toHM(s0),n*UNIT)}
+function times(){const r=[];for(let m=toMin(D.settings.open);m<=toMin(D.settings.lastStart);m+=STEP)r.push(toHM(m));return r}
+const endHM=(time,mins)=>toHM(toMin(time)+mins);
+const when=a=>dayLabel(a.date)+' · '+a.time+'–'+endHM(a.time,svc(a.svc).mins);
+const isEarly=(date,time,mins)=>{const wd=wdayOf(date),t=toMin(time);return wd>=1&&wd<=5&&t>=toMin(D.settings.earlyFrom)&&t+mins<=toMin(D.settings.earlyTo)};   // must START after earlyFrom and FINISH by earlyTo
+const priceAt=(sv,date,time)=>sv.promo&&date&&time&&isEarly(date,time,sv.mins)?sv.promo:sv.price;
+const isOff=(th,date)=>((D.therapists.find(x=>x.id===th)||{}).off||[]).includes(wdayOf(date));
+const offNote=(th,date)=>isOff(th,date)?`<p class="tag">${esc((D.therapists.find(x=>x.id===th)||{}).name)} has a day off on this day.</p>`:'';
+const slotLive=l=>!!l&&(l.holdUntil==null||l.holdUntil>Date.now());
+function free(th,date,time,sv,mine){
+  const ids=needed(th,date,time,sv);if(!ids||isPast(date,time)||isOff(th,date))return false;
+  return ids.every(i=>{const l=D.slots[i];return !slotLive(l)||(mine&&l.apptId===mine)})}
+const lockDoc=(a,holdUntil)=>({apptId:a.id,th:a.th,date:a.date,holdUntil});
+const note=(to,m,ph)=>({to,m:('JENDELL: '+m).slice(0,160),ph:ph||'',t:Date.now()});
+const logDoc=a=>({at:Date.now(),by:S.user.name,role:S.user.role,a});
+
+/* ---------------------------------------------------------------------
+   Image helper: shrink a payment screenshot before it is stored
+   --------------------------------------------------------------------- */
+async function shrink(file,small,max){
+  if(!/^image\//.test(file.type))throw new Error('notimage');
+  const bmp=await createImageBitmap(file),sc=Math.min(1,(max||(small?640:900))/Math.max(bmp.width,bmp.height));
+  const c=document.createElement('canvas');c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);
+  c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+  const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',small?.55:.7));
+  const url=await new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(blob)});
+  return{blob,url}}
+
+/* =====================================================================
+   DATABASE ADAPTER 1: LOCAL (demo mode). Saved in this browser's storage.
+   Same interface as the Firebase adapter, so the app code never changes.
+   ===================================================================== */
+const COLS=['users','services','therapists','appointments','slots','notes','log','settings'];
+const LKEY='jendellbook.db.v1';
+let memStore=null;                                    // used only if browser storage is blocked
+const store={get(){try{return localStorage.getItem(LKEY)}catch(e){return memStore}},set(v){try{localStorage.setItem(LKEY,v)}catch(e){memStore=v}},clear(){try{localStorage.removeItem(LKEY)}catch(e){}memStore=null}};
+async function sha(s){
+  if(crypto&&crypto.subtle){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+  let h=5381;for(const c of s)h=((h<<5)+h+c.charCodeAt(0))|0;return 'weak'+h}      // fallback, demo only
+const ss={get:k=>{try{return sessionStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{sessionStorage.setItem(k,v)}catch(e){}},del:k=>{try{sessionStorage.removeItem(k)}catch(e){}}};
+const Local={
+  mode:'local',cb:()=>{},
+  on(fn){this.cb=fn},
+  load(){let o=null;try{o=JSON.parse(store.get())}catch(e){}if(!o)return null;COLS.forEach(c=>o[c]=o[c]||{});return o},
+  async init(){if(!this.load())await this.seed();addEventListener('storage',e=>{if(e.key===LKEY)this.pull()});this.pull(true)},
+  pull(silent){
+    const db=this.load();if(!db)return;const arr=c=>Object.entries(db[c]).map(([id,o])=>({id,...o}));
+    D.users=arr('users');D.services=arr('services');D.therapists=arr('therapists');D.appointments=arr('appointments');
+    D.slots=db.slots;D.notes=arr('notes').sort((a,b)=>b.t-a.t);D.log=arr('log').sort((a,b)=>b.at-a.at).slice(0,100);
+    D.settings={...DEFAULTS,...(db.settings.main||{})};if(!silent)this.cb()},
+  async seed(){
+    const db={};COLS.forEach(c=>db[c]={});
+    db.services={s1:{name:'Swedish massage',mins:60,price:700,on:true},s2:{name:'Deep tissue massage',mins:60,price:850,on:true},s3:{name:'Hot stone therapy',mins:90,price:1200,on:true}};
+    db.therapists={t1:{name:'Marites',spec:'Swedish, aromatherapy',on:true},t2:{name:'Joyce',spec:'Deep tissue, sports',on:true},t3:{name:'Lorna',spec:'Hot stone',on:true}};
+    const mk=async(id,email,pw,name,role,extra)=>{const salt=uid();db.users[id]={email,name,role,salt,hash:await sha(salt+pw),...extra}};
+    await mk('u1','demo@client.ph','client123','Maria Santos','client',{phone:'0917 000 0000'});
+    await mk('u2','staff@jendell.ph','staff123','Front Desk','staff');
+    await mk('u3','admin@jendell.ph','admin123','Owner','admin');
+    await mk('u4','marites@jendell.ph','therapist123','Marites','therapist',{thId:'t1'});
+    await mk('u5','joyce@jendell.ph','therapist123','Joyce','therapist',{thId:'t2'});
+    await mk('u6','lorna@jendell.ph','therapist123','Lorna','therapist',{thId:'t3'});
+    const today=dkey(new Date()),seedAppt=(id,who,sv,th,time)=>{const ids=units(th,today,time,60);
+      db.appointments[id]={who,cid:null,ph:'',svc:sv,th,date:today,time,slots:ids,price:700,status:'Confirmed',holdUntil:null,proofs:[{ref:'GC'+id,file:'seed.png',url:'',st:'Verified'}],created:Date.now()};
+      ids.forEach(s=>{db.slots[s]={apptId:id,th,date:today,holdUntil:null}})};
+    seedAppt('a1','Ana R.','s2','t2','11:00');seedAppt('a2','Ben L.','s1','t1','13:00');
+    db.settings.main={...DEFAULTS};this.save(db)},
+  save(db){store.set(JSON.stringify(db))},
+  async reset(){store.clear();await this.seed();this.pull()},
+  /* auth */
+  prof(id,u){return{uid:id,email:u.email,name:u.name,phone:u.phone||'',role:u.role,thId:u.thId||null}},
+  async signIn(em,pw){const db=this.load(),e=Object.entries(db.users).find(([,u])=>u.email===em);
+    if(!e||await sha(e[1].salt+pw)!==e[1].hash)throw new Error('badlogin');ss.set('jb.s',e[0]);return this.prof(e[0],e[1])},
+  async signUp(p,pw){return this._make(p,pw,true)},
+  async createAccount(p,pw){return this._make(p,pw,false)},
+  async _make(p,pw,login){
+    const db=this.load();if(Object.values(db.users).some(u=>u.email===p.email))throw new Error('exists');
+    const id=uid(),salt=uid();db.users[id]={email:p.email,name:p.name,phone:p.phone||'',role:p.role||'client',salt,hash:await sha(salt+pw),...(p.thId?{thId:p.thId}:{})};
+    this.save(db);this.pull(true);if(login)ss.set('jb.s',id);this.cb();return this.prof(id,db.users[id])},
+  async restore(){const id=ss.get('jb.s'),db=this.load(),u=id&&db&&db.users[id];return u?this.prof(id,u):null},
+  async signOut(){ss.del('jb.s')},
+  async startSync(){this.pull(true)},
+  /* data */
+  async txn(fn){
+    const run=async()=>{const db=this.load();
+      const t={get:(c,id)=>db[c][id]?JSON.parse(JSON.stringify(db[c][id])):null,set:(c,id,o)=>{db[c][id]=JSON.parse(JSON.stringify(o))},del:(c,id)=>{delete db[c][id]}};
+      const r=await fn(t);this.save(db);return r};                       // nothing is saved if fn throws
+    const out=navigator.locks?await navigator.locks.request('jb-db',run):await run();this.pull();return out},
+  async set(c,id,o){return this.txn(t=>t.set(c,id,o))},
+  async update(c,id,p){return this.txn(async t=>{const o=await t.get(c,id);t.set(c,id,{...o,...p})})},
+  async del(c,id){return this.txn(t=>t.del(c,id))},
+  async uploadProof(owner,apptId,shrunk){return shrunk.url},
+  async exportAll(){return this.load()},
+  async importAll(o){COLS.forEach(c=>{if(typeof o[c]!=='object'||!o[c])throw new Error('badbackup')});this.save(o);this.pull()}
+};
+
+/* =====================================================================
+   DATABASE ADAPTER 2: FIREBASE (Auth + Cloud Firestore + Cloud Storage)
+   Loaded only when FIREBASE_CONFIG is filled in.
+   ===================================================================== */
+async function makeFirebase(cfg){
+  const base='https://www.gstatic.com/firebasejs/10.14.1/firebase-';
+  const [A,Au,F,St]=await Promise.all(['app','auth','firestore',...(USE_CLOUD_STORAGE?['storage']:[])].map(n=>import(base+n+'.js')));
+  const app=A.initializeApp(cfg),auth=Au.getAuth(app),fs=F.getFirestore(app),st=USE_CLOUD_STORAGE?St.getStorage(app):null;
+  const clean=o=>JSON.parse(JSON.stringify(o));
+  let unsubs=[];const stop=()=>{unsubs.forEach(u=>u());unsubs=[]};
+  const readProfile=async u=>{const s=await F.getDoc(F.doc(fs,'users',u.uid));return s.exists()?{uid:u.uid,email:u.email,...s.data()}:null};
+  const self={
+    mode:'firebase',cb:()=>{},on(fn){this.cb=fn},async init(){},
+    async restore(){const u=await new Promise(r=>{const un=Au.onAuthStateChanged(auth,x=>{un();r(x)})});if(!u)return null;
+      const p=await readProfile(u);if(!p)await Au.signOut(auth);return p},
+    async signIn(em,pw){const c=await Au.signInWithEmailAndPassword(auth,em,pw);const p=await readProfile(c.user);
+      if(!p){await Au.signOut(auth);throw new Error('noprofile')}return p},
+    async signUp(p,pw){const c=await Au.createUserWithEmailAndPassword(auth,p.email,pw);
+      const d={email:p.email,name:p.name,phone:p.phone||'',role:'client'};await F.setDoc(F.doc(fs,'users',c.user.uid),d);return{uid:c.user.uid,...d}},
+    async createAccount(p,pw){                                           // admin makes staff/therapist logins without being signed out
+      const a2=A.initializeApp(cfg,'sec'+Date.now()),au2=Au.getAuth(a2);
+      const c=await Au.createUserWithEmailAndPassword(au2,p.email,pw);await Au.signOut(au2);
+      await F.setDoc(F.doc(fs,'users',c.user.uid),clean({email:p.email,name:p.name,phone:'',role:p.role,thId:p.thId||null}));return c.user.uid},
+    async signOut(){stop();await Au.signOut(auth)},
+    startSync(p){
+      stop();const emit=()=>self.cb(),C=n=>F.collection(fs,n);
+      const L=(q,fn)=>unsubs.push(F.onSnapshot(q,fn,e=>{console.error(e);toast('Sync problem: '+(e.code||e.message))}));
+      const list=(name,sort)=>s=>{D[name]=s.docs.map(d=>({id:d.id,...d.data()}));if(sort)D[name].sort(sort);emit()};
+      L(C('services'),list('services'));L(C('therapists'),list('therapists'));
+      L(F.query(C('slots'),F.where('date','>=',dkey(new Date()))),s=>{const m={};s.docs.forEach(d=>m[d.id]=d.data());D.slots=m;emit()});
+      L(F.doc(fs,'settings','main'),s=>{D.settings={...DEFAULTS,...(s.data()||{})};emit()});
+      const ap=p.role==='client'?F.query(C('appointments'),F.where('cid','==',p.uid)):p.role==='therapist'?F.query(C('appointments'),F.where('th','==',p.thId)):C('appointments');
+      L(ap,list('appointments'));
+      if(p.role==='client')L(F.query(C('notes'),F.where('to','==',p.uid)),list('notes',(a,b)=>b.t-a.t));
+      if(p.role==='admin'){L(C('log'),list('log',(a,b)=>b.at-a.at));L(C('users'),list('users'))}
+    },
+    async txn(fn){return F.runTransaction(fs,tx=>fn({
+      get:async(c,id)=>{const s=await tx.get(F.doc(fs,c,id));return s.exists()?s.data():null},      // all reads must come before writes
+      set:(c,id,o)=>tx.set(F.doc(fs,c,id),clean(o)),del:(c,id)=>tx.delete(F.doc(fs,c,id))}))},
+    async set(c,id,o){await F.setDoc(F.doc(fs,c,id),clean(o))},
+    async update(c,id,p){await F.updateDoc(F.doc(fs,c,id),clean(p))},
+    async del(c,id){await F.deleteDoc(F.doc(fs,c,id))},
+    async uploadProof(owner,apptId,shrunk){if(!USE_CLOUD_STORAGE)return shrunk.url;        // small image stored in the booking record
+      const r=St.ref(st,`proofs/${owner}/${apptId}/${Date.now()}.jpg`);
+      await St.uploadBytes(r,shrunk.blob,{contentType:'image/jpeg'});return St.getDownloadURL(r)},
+    async exportAll(){const out={};for(const c of['services','therapists','appointments','users','log','settings','slots']){
+      const s=await F.getDocs(F.collection(fs,c));out[c]={};s.docs.forEach(d=>out[c][d.id]=d.data())}return out},
+    async importAll(){throw new Error('Restore is only available in demo mode. Use the Firebase console to import data.')}
+  };
+  return self}
+
+/* =====================================================================
+   APP
+   ===================================================================== */
+let tt;function toast(m){const e=$('#toast');e.textContent=m;e.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('on'),3000)}
+function showImg(src){const l=$('#lightbox');l.querySelector('img').src=src;l.classList.add('on')}
+function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove()}
+/* light / dark mode (remembered in this browser) */
+(()=>{try{const t=localStorage.getItem('jb.theme');if(t)document.documentElement.dataset.theme=t}catch(e){}})();
+function toggleTheme(){const r=document.documentElement,dark=r.dataset.theme==='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches),n=dark?'light':'dark';
+  r.dataset.theme=n;try{localStorage.setItem('jb.theme',n)}catch(e){}}
+function fail(e){console.error(e);const m=String(e&&(e.message||e.code)||e);
+  if(m==='taken'){toast('That slot was just taken. Availability is refreshed.');S.sel.time=null;S.walk.time=null}
+  else if(m==='stale')toast('That booking changed while you were working. Please try again.');
+  else if(/permission/i.test(m))toast('Not allowed. Check your Firestore security rules.');
+  else if(m==='notimage')toast('Please attach an image (a screenshot or photo).');
+  else toast('Something went wrong: '+m)}
+const run=fn=>async(...a)=>{if(S.busy)return;S.busy=true;try{await fn(...a)}catch(e){fail(e)}finally{S.busy=false;render()}};
+const can=r=>S.user&&r.includes(S.user.role);
+const setMode=m=>{S.mode=m;S.reg=false;render()};
+const setReg=v=>{S.reg=v;render()};
+
+/* ---- auth ---- */
+const signUp=run(async()=>{
+  const name=$('#an').value.trim(),ph=$('#ap').value.trim(),em=$('#ae').value.trim().toLowerCase(),pw=$('#aw').value;
+  if(!name||!ph||!em||!pw)return toast('Fill in every field to create your account.');
+  if(!/^\S+@\S+\.\S+$/.test(em))return toast('Enter a valid email address.');
+  if(!/^(09|\+639)\d{9}$/.test(ph.replace(/[\s-]/g,'')))return toast('Enter a Philippine mobile number, like 0917 123 4567.');
+  if(pw.length<6)return toast('Use a password of at least 6 characters.');
+  try{S.user=await DB.signUp({email:em,name,phone:ph},pw)}
+  catch(e){if(e.message==='exists'||e.code==='auth/email-already-in-use')return toast('That email already has an account. Log in instead.');throw e}
+  await DB.startSync(S.user);toast('Account created. Welcome, '+name.split(' ')[0]+'.')});
+const logIn=run(async()=>{
+  const em=$('#le').value.trim().toLowerCase(),pw=$('#lw').value;let u;
+  try{u=await DB.signIn(em,pw)}catch(e){return toast(e.message==='noprofile'?'This login has no JendellBook profile yet. Ask the owner to finish setting it up.':'Wrong email or password. Check both and try again.')}
+  if((S.mode==='client')!==(u.role==='client')){await DB.signOut();return toast(S.mode==='client'?'That is a staff account. Switch to Staff to log in.':'That is a client account. Switch to Client to log in.')}
+  S.user=u;S.thView=u.thId||null;await DB.startSync(u);toast('Logged in.')});
+const logOut=run(async()=>{await DB.signOut();S.user=null;S.mode='client';S.reg=false;S.resch=null;
+  Object.assign(D,{appointments:[],notes:[],log:[],users:[]});toast('You’re logged out.')});
+const ent=f=>`onkeydown="if(event.key==='Enter')${f}()"`;
+
+/* login page artwork: a calm spa scene drawn in SVG. If public/images/login-bg.jpg exists it is shown on top of this. */
+const SCENE=`<div class="scene" aria-hidden="true"><svg viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" focusable="false">
+<defs>
+<linearGradient id="sg1" x1="0" y1="0" x2=".5" y2="1"><stop offset="0" stop-color="#091d20"/><stop offset=".5" stop-color="#12403c"/><stop offset="1" stop-color="#2a7565"/></linearGradient>
+<radialGradient id="sg2" cx=".74" cy=".26" r=".42"><stop offset="0" stop-color="#f6d28a" stop-opacity=".6"/><stop offset="1" stop-color="#f6d28a" stop-opacity="0"/></radialGradient>
+<radialGradient id="sg3" cx=".12" cy=".92" r=".55"><stop offset="0" stop-color="#7fe0c4" stop-opacity=".38"/><stop offset="1" stop-color="#7fe0c4" stop-opacity="0"/></radialGradient>
+<linearGradient id="sg4" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ece5d6"/><stop offset="1" stop-color="#8f897c"/></linearGradient>
+<linearGradient id="sg5" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1b5749"/><stop offset="1" stop-color="#33907a"/></linearGradient>
+<linearGradient id="sg6" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#8fb572" stop-opacity=".6"/><stop offset="1" stop-color="#2f5a3c" stop-opacity=".6"/></linearGradient>
+<filter id="sb" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="7"/></filter>
+</defs>
+<rect width="1600" height="1000" fill="url(#sg1)"/><rect width="1600" height="1000" fill="url(#sg2)"/><rect width="1600" height="1000" fill="url(#sg3)"/>
+<circle cx="1180" cy="260" r="132" fill="#f8e2b0" fill-opacity=".13"/><circle cx="1180" cy="260" r="80" fill="#f8e2b0" fill-opacity=".2"/>
+<g fill="url(#sg6)"><rect x="1330" y="-20" width="26" height="1100" rx="10"/><rect x="1410" y="-20" width="20" height="1100" rx="9" opacity=".7"/><rect x="1500" y="-20" width="30" height="1100" rx="11" opacity=".9"/><rect x="60" y="-20" width="22" height="1100" rx="9" opacity=".55"/><rect x="132" y="-20" width="16" height="1100" rx="8" opacity=".4"/></g>
+<g stroke="#0c2a26" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"><path d="M1326 170h34M1326 360h34M1326 560h34M1326 770h34M1406 120h26M1406 300h26M1406 500h26M1406 710h26M1496 220h38M1496 430h38M1496 640h38M56 200h30M56 420h30M56 650h30M128 300h22M128 560h22"/></g>
+<g fill="#4f8a5a" fill-opacity=".5"><path d="M1356 360c60-30 120-24 170 8-60 22-120 20-170-8z"/><path d="M1330 560c-60-34-120-34-174-6 56 28 118 30 174 6z"/><path d="M1432 300c50-40 110-50 160-30-50 34-108 44-160 30z"/><path d="M84 420c58-28 116-22 164 12-58 22-118 18-164-12z"/><path d="M60 650c-44-30-90-34-130-12 42 26 90 30 130 12z"/></g>
+<g fill="none" stroke="#c6f0e2" stroke-opacity=".2" stroke-width="2"><ellipse cx="520" cy="884" rx="130" ry="22"/><ellipse cx="520" cy="884" rx="236" ry="40"/><ellipse cx="520" cy="884" rx="346" ry="60"/><ellipse cx="520" cy="884" rx="468" ry="80" stroke-opacity=".1"/></g>
+<ellipse cx="520" cy="900" rx="178" ry="20" fill="#000" fill-opacity=".34" filter="url(#sb)"/>
+<path d="M360 880c0-36 72-58 160-58s160 22 160 58c0 22-72 36-160 36s-160-14-160-36z" fill="url(#sg4)"/>
+<path d="M405 826c0-26 54-42 115-42s115 16 115 42c0 18-54 28-115 28s-115-10-115-28z" fill="url(#sg4)"/>
+<path d="M452 786c0-20 38-32 68-32s68 12 68 32c0 14-38 22-68 22s-68-8-68-22z" fill="url(#sg4)"/>
+<ellipse cx="520" cy="752" rx="26" ry="8" fill="#f8e2b0" fill-opacity=".35"/>
+<g transform="translate(-50 1030) rotate(-26)"><path d="M0 0C96-160 340-240 580-156 392-84 164-20 0 0z" fill="url(#sg5)"/><path d="M0 0C170-62 372-114 560-154" stroke="#0b2f28" stroke-opacity=".55" stroke-width="3" fill="none"/></g>
+<g transform="translate(130 1040) rotate(-64)"><path d="M0 0C80-130 280-190 470-124 320-66 140-16 0 0z" fill="url(#sg5)" fill-opacity=".85"/><path d="M0 0C140-50 300-92 452-122" stroke="#0b2f28" stroke-opacity=".5" stroke-width="3" fill="none"/></g>
+<g transform="translate(1660 1040) rotate(206)"><path d="M0 0C90-150 320-220 540-140 366-78 152-18 0 0z" fill="url(#sg5)" fill-opacity=".8"/><path d="M0 0C160-58 346-106 522-138" stroke="#0b2f28" stroke-opacity=".5" stroke-width="3" fill="none"/></g>
+<g fill="#fff" fill-opacity=".55"><circle cx="300" cy="240" r="2.5"/><circle cx="640" cy="150" r="2"/><circle cx="880" cy="330" r="3"/><circle cx="1020" cy="120" r="2"/><circle cx="1260" cy="520" r="2.5"/><circle cx="760" cy="560" r="2"/><circle cx="180" cy="520" r="2"/><circle cx="1090" cy="700" r="2.5"/></g>
+<g fill="#f8e2b0" fill-opacity=".55"><path d="M860 440c6 6 8 12 6 18-8-2-12-8-6-18z"/><path d="M980 560c6 6 8 12 6 18-8-2-12-8-6-18z"/><path d="M700 380c6 6 8 12 6 18-8-2-12-8-6-18z"/></g>
+</svg><div class="photo"></div></div>`;
+const IC={
+ clock:'<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+ wallet:'<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 7V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2H5"/><path d="M16 14h2"/></svg>',
+ chat:'<svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.4A8 8 0 1 1 21 12z"/></svg>'};
+function auth(){
+  const c=S.mode==='client',demo=DB.mode==='local';
+  const login=`<label for="le">Email</label><input type="email" id="le" autocomplete="username" ${ent('logIn')}>
+   <label for="lw">Password</label><input type="password" id="lw" autocomplete="current-password" ${ent('logIn')}>
+   <div class="tools" style="margin-top:18px"><button class="btn" style="width:100%" onclick="logIn()">Log in</button></div>
+   ${c?'<p class="note">New here? <button class="link" onclick="setReg(true)">Create an account</button></p>'+(demo?'<p class="note">Sample login: demo@client.ph / client123</p>':''):(demo?'<p class="note">Demo logins: staff@jendell.ph / staff123 · marites@jendell.ph / therapist123 · admin@jendell.ph / admin123</p>':'<p class="note">Staff accounts are created by the owner.</p>')}`;
+  const signup=`<label for="an">Full name</label><input type="text" id="an" autocomplete="name">
+   <label for="ap">Mobile number</label><input type="tel" id="ap" autocomplete="tel" placeholder="09XX XXX XXXX, for SMS updates">
+   <label for="ae">Email</label><input type="email" id="ae" autocomplete="email">
+   <label for="aw">Password</label><input type="password" id="aw" autocomplete="new-password" ${ent('signUp')}>
+   <div class="tools" style="margin-top:18px"><button class="btn" style="width:100%" onclick="signUp()">Create account</button></div>
+   <p class="note">Already registered? <button class="link" onclick="setReg(false)">Log in</button></p>`;
+  return `<div class="landing">${SCENE}<div class="landing-in">
+   <section class="hero"><span class="kicker">JENDELL Massage and Spa</span>
+    <h2>Book your massage.<br><em>Unwind</em> your day.</h2>
+    <p class="sub">Choose your therapist and a time that suits you, reserve your slot with GCash, and we’ll text you as soon as it’s confirmed.</p>
+    <ul class="perks">
+     <li><span class="pi">${IC.clock}</span><span><b>Live availability</b>Open from ${to12(D.settings.open)}. The last booking starts at ${to12(D.settings.lastStart)}.</span></li>
+     <li><span class="pi">${IC.wallet}</span><span><b>Simple reservation</b>Secure your slot with a ₱100 GCash reservation fee.</span></li>
+     <li><span class="pi">${IC.chat}</span><span><b>Text updates</b>Confirmations and reminders are sent to your phone.</span></li>
+    </ul></section>
+   <div class="auth"><section class="panel card-auth"><h1>${c?(S.reg?'Create your account':'Welcome back'):'Staff sign in'}</h1>
+    <p class="lead">${c?(S.reg?'Reserve a therapist and time slot at JENDELL Massage and Spa.':'Log in to book or manage your massage.'):'For the front desk, therapists, and the owner.'}</p>
+    <div class="seg" role="group" aria-label="Account type"><button aria-pressed="${c}" onclick="setMode('client')">Client</button><button aria-pressed="${!c}" onclick="setMode('staff')">Staff</button></div>
+    ${c&&S.reg?signup:login}</section></div></div></div>`}
+
+/* ---- client actions ---- */
+function pick(k,v){S.sel[k]=v;if(k==='svc'||k==='th'||k==='day')S.sel.time=null;render()}
+const book=run(async()=>{
+  const s=S.sel,sv=svc(s.svc);if(!s.time)return toast('Choose a time slot first.');
+  const addr=sv.home?($('#addr')?$('#addr').value.trim():''):'';if(sv.home&&addr.length<8)return toast('Enter the full home address for the home service.');
+  if(S.race&&DB.mode==='local'){S.race=false;await rival(s)}                       // test helper: another client grabs the slot first
+  const ids=needed(s.th,s.day,s.time,sv);if(!ids||isOff(s.th,s.day))throw new Error('taken');
+  if(S.resch){
+    const id=S.resch;
+    await DB.txn(async t=>{
+      const a=await t.get('appointments',id);if(!a)throw new Error('stale');
+      const cur=await Promise.all(ids.map(i=>t.get('slots',i)));
+      if(cur.some((l,k)=>slotLive(l)&&l.apptId!==id))throw new Error('taken');
+      const olds=await Promise.all((a.slots||[]).map(async i=>[i,await t.get('slots',i)]));                // reads first…
+      olds.forEach(([i,l])=>{if(l&&l.apptId===id&&!ids.includes(i))t.del('slots',i)});                      // …then writes
+      const hold=['Confirmed','Completed'].includes(a.status)?null:a.holdUntil;
+      ids.forEach(i=>t.set('slots',i,lockDoc({id,th:s.th,date:s.day},hold)));
+      t.set('appointments',id,{...a,svc:s.svc,th:s.th,date:s.day,time:s.time,slots:ids,price:priceAt(sv,s.day,s.time)});
+      if(a.cid)t.set('notes',uid(),note(a.cid,'Your booking was moved to '+dayLabel(s.day)+' at '+s.time+'.',a.ph));
+    });
+    S.resch=null;S.sel.time=null;return toast('Booking rescheduled.')}
+  const id=uid(),hold=Date.now()+D.settings.holdMin*60000;
+  await DB.txn(async t=>{
+    const cur=await Promise.all(ids.map(i=>t.get('slots',i)));                                              // read every slot…
+    if(cur.some(slotLive))throw new Error('taken');                                                         // …all-or-nothing check…
+    ids.forEach(i=>t.set('slots',i,lockDoc({id,th:s.th,date:s.day},hold)));                                // …then lock them all
+    t.set('appointments',id,{who:S.user.name,cid:S.user.uid,ph:S.user.phone||'',svc:s.svc,th:s.th,date:s.day,time:s.time,slots:ids,price:priceAt(sv,s.day,s.time),addr,status:'Pending Payment',holdUntil:hold,proofs:[],created:Date.now()});
+  });
+  S.sel.time=null;toast('Slot held for '+D.settings.holdMin+' minutes. Submit your GCash proof to continue.')});
+async function rival(s){const ids=needed(s.th,s.day,s.time,svc(s.svc)),rid=uid(),h=Date.now()+60000;
+  await DB.txn(async t=>{ids.forEach(i=>t.set('slots',i,{apptId:rid,th:s.th,date:s.day,holdUntil:h}));
+    t.set('appointments',rid,{who:'Another client',cid:null,ph:'',svc:s.svc,th:s.th,date:s.day,time:s.time,slots:ids,status:'Pending Payment',holdUntil:h,proofs:[],created:Date.now()})})}
+const sendProof=run(async id=>{
+  const ref=$('#ref'+id).value.trim(),f=$('#file'+id).files[0];
+  if(!ref||!f)return toast('Enter the GCash reference number and attach a screenshot.');
+  if(!/^[A-Za-z0-9-]{6,30}$/.test(ref))return toast('The reference number should be 6 to 30 letters or digits.');
+  const sh=await shrink(f,DB.mode==='firebase'&&!USE_CLOUD_STORAGE),a0=D.appointments.find(x=>x.id===id);
+  const url=await DB.uploadProof(S.user.uid,id,sh);
+  await DB.txn(async t=>{
+    const a=await t.get('appointments',id);if(!a||a.status!=='Pending Payment'||(a.holdUntil&&a.holdUntil<Date.now()))throw new Error('stale');
+    const cur=await Promise.all((a.slots||[]).map(async i=>[i,await t.get('slots',i)]));
+    if(cur.some(([,l])=>!l||l.apptId!==id))throw new Error('stale');
+    const vb=D.settings.verifyH>0?Date.now()+D.settings.verifyH*3600000:null;     // client's timer stops; optional staff limit starts
+    cur.forEach(([i])=>t.set('slots',i,lockDoc({id,th:a.th,date:a.date},vb)));
+    t.set('appointments',id,{...a,status:'Pending Verification',holdUntil:vb,proofs:[...(a.proofs||[]),{ref,file:f.name,url,st:'Pending',at:Date.now()}]});
+  });
+  toast('Proof sent. Staff have been notified.')});
+function resch(id){const a=D.appointments.find(x=>x.id===id);S.resch=id;S.sel={svc:a.svc,th:a.th,day:a.date,time:null};render();scrollTo(0,0)}
+const cancelResch=()=>{S.resch=null;render()};
+async function release(t,id,newStatus,by){                    // shared: set status and free this booking's slot locks (reads first)
+  const a=await t.get('appointments',id);if(!a)throw new Error('stale');
+  const cur=await Promise.all((a.slots||[]).map(async i=>[i,await t.get('slots',i)]));
+  cur.forEach(([i,l])=>{if(l&&l.apptId===id)t.del('slots',i)});
+  t.set('appointments',id,{...a,status:newStatus,holdUntil:null});return a}
+function canChange(a){return can(['staff','admin'])||a.status==='Pending Payment'||startMs(a.date,a.time)-Date.now()>=D.settings.cutoffH*3600000}
+const cancelAppt=run(async id=>{
+  const a0=D.appointments.find(x=>x.id===id);if(a0&&!canChange(a0))return toast('Changes close '+D.settings.cutoffH+' hours before the appointment. Please call the spa.');
+  await DB.txn(async t=>{const a=await release(t,id,'Cancelled');
+    if(a.cid)t.set('notes',uid(),note(a.cid,'Your booking on '+dayLabel(a.date)+' at '+a.time+' was cancelled.',a.ph));
+    if(S.user.role!=='client')t.set('log',uid(),logDoc('Cancelled booking #'+id.slice(-4)))});
+  toast('Booking cancelled.')});
+const expire=async id=>{                                         // a held slot ran out of time: free it
+  try{await DB.txn(async t=>{const a=await t.get('appointments',id);
+      if(!a||!['Pending Payment','Pending Verification'].includes(a.status)||!a.holdUntil||a.holdUntil>Date.now())return;
+      await release(t,id,'Cancelled');
+      if(a.cid)t.set('notes',uid(),note(a.cid,'Your held slot on '+dayLabel(a.date)+' at '+a.time+' was released because no payment proof was verified in time.',a.ph))});
+    toast('A held slot expired and was released.')}
+  catch(e){console.error(e);setTimeout(()=>S.exp.delete(id),15000)}};
+
+/* ---- staff / therapist / admin actions ---- */
+const decide=run(async(id,ok)=>{
+  const a0=D.appointments.find(x=>x.id===id),p0=a0.proofs[a0.proofs.length-1];
+  if(ok&&D.appointments.some(o=>o.id!==id&&(o.proofs||[]).some(q=>q.ref===p0.ref&&q.st==='Verified')))return toast('This reference number was already verified for another booking.');
+  await DB.txn(async t=>{
+    const a=await t.get('appointments',id);if(!a||a.status!=='Pending Verification'||(a.holdUntil&&a.holdUntil<Date.now()))throw new Error('stale');
+    const proofs=[...a.proofs],p=proofs[proofs.length-1];p.st=ok?'Verified':'Rejected';p.by=S.user.name;p.decidedAt=Date.now();
+    const cur=await Promise.all((a.slots||[]).map(async i=>[i,await t.get('slots',i)]));
+    if(ok){
+      cur.forEach(([i,l])=>{if(l&&l.apptId===id)t.set('slots',i,lockDoc({id,th:a.th,date:a.date},null))});
+      t.set('appointments',id,{...a,proofs,status:'Confirmed',holdUntil:null});
+      if(a.cid)t.set('notes',uid(),note(a.cid,'Your booking on '+dayLabel(a.date)+' at '+a.time+' is confirmed.',a.ph));
+      t.set('log',uid(),logDoc('Verified payment proof for booking #'+id.slice(-4)+' (ref '+p.ref+')'));
+    }else{
+      const hold=Date.now()+D.settings.holdMin*60000;                                                   // client gets a fresh window to resubmit
+      cur.forEach(([i,l])=>{if(l&&l.apptId===id)t.set('slots',i,lockDoc({id,th:a.th,date:a.date},hold))});
+      t.set('appointments',id,{...a,proofs,status:'Pending Payment',holdUntil:hold});
+      if(a.cid)t.set('notes',uid(),note(a.cid,'Your payment proof was rejected. Send a clear screenshot and the correct reference number within the time shown.',a.ph));
+      t.set('log',uid(),logDoc('Rejected payment proof for booking #'+id.slice(-4)));
+    }});
+  toast(ok?'Verified. Booking confirmed.':'Rejected. The client gets a new hold window to resubmit.')});
+const complete=run(async id=>{await DB.txn(async t=>{
+  const a=await t.get('appointments',id);if(!a||a.status!=='Confirmed')throw new Error('stale');
+  t.set('appointments',id,{...a,status:'Completed'});
+  if(a.cid)t.set('notes',uid(),note(a.cid,'Thanks for visiting JENDELL. We hope to see you again.',a.ph));
+  t.set('log',uid(),logDoc('Marked booking #'+id.slice(-4)+' completed'))})});
+const remind=run(async id=>{const a=D.appointments.find(x=>x.id===id);
+  await DB.set('notes',uid(),note(a.cid,'Reminder: '+svc(a.svc).name+' with '+thr(a.th).name+' on '+dayLabel(a.date)+' at '+a.time+'.',a.ph));
+  await DB.set('log',uid(),logDoc('Sent SMS reminder for booking #'+id.slice(-4)));toast('SMS reminder sent.')});
+function wpick(k,v){S.walk.name=$('#wn').value;S.walk[k]=v;if(k!=='time'&&k!=='name')S.walk.time=null;render()}
+const walkIn=run(async()=>{
+  const n=$('#wn').value.trim(),w=S.walk;S.walk.name=n;
+  if(!n)return toast('Enter the client’s name.');if(!w.time)return toast('Choose a time slot.');
+  const wsv=svc(w.svc),addr=wsv.home?$('#wa').value.trim():'';if(wsv.home&&addr.length<8)return toast('Enter the full home address.');
+  const ids=needed(w.th,w.day,w.time,svc(w.svc));if(!ids||isOff(w.th,w.day))throw new Error('taken');const id=uid();
+  await DB.txn(async t=>{
+    const cur=await Promise.all(ids.map(i=>t.get('slots',i)));if(cur.some(slotLive))throw new Error('taken');
+    ids.forEach(i=>t.set('slots',i,lockDoc({id,th:w.th,date:w.day},null)));
+    t.set('appointments',id,{who:n,cid:null,ph:'',svc:w.svc,th:w.th,date:w.day,time:w.time,slots:ids,price:priceAt(svc(w.svc),w.day,w.time),addr,status:'Confirmed',holdUntil:null,proofs:[],created:Date.now()});
+    t.set('log',uid(),logDoc('Entered walk-in booking for '+n))});
+  w.time=null;w.name='';toast('Walk-in booking saved and confirmed.')});
+const editOn=(k,id)=>{S.edit={k,id};render()};
+const editOff=()=>{S.edit=null;render()};
+const saveSvc=run(async id=>{
+  const n=$('#en').value.trim(),m=+$('#em').value,p=+$('#ep').value,pr=$('#epr').value.trim(),c=$('#ec').value.trim();
+  if(!n||!(m>0)||!(p>0)||(pr!==''&&!(+pr>0)))return toast('Enter a name, minutes, a price, and (optionally) a valid early bird price.');
+  await DB.update('services',id,{name:n,mins:m,price:p,cat:c,promo:pr===''?null:+pr});
+  await DB.set('log',uid(),logDoc('Edited service: '+n+' ('+m+' min, ₱'+p+(pr?', early bird ₱'+pr:'')+')'));S.edit=null;toast('Service saved.')});
+const saveTh=run(async id=>{
+  const n=$('#etn').value.trim(),sp=$('#ets').value.trim(),f=$('#etp').files[0];
+  if(!n)return toast('Enter the therapist’s name.');
+  const patch={name:n,spec:sp,off:[...document.querySelectorAll('#eoff input:checked')].map(x=>+x.value)};if(f)patch.photo=(await shrink(f,true,320)).url;
+  await DB.update('therapists',id,patch);await DB.set('log',uid(),logDoc('Edited therapist: '+n));S.edit=null;toast('Therapist saved.')});
+const addSvc=run(async()=>{const n=$('#sn').value.trim(),m=+$('#sm').value,p=+$('#sp').value;
+  if(!n||!(m>0)||!(p>0))return toast('Fill in name, minutes, and price.');
+  await DB.set('services',uid(),{name:n,mins:m,price:p,on:true});await DB.set('log',uid(),logDoc('Added service: '+n))});
+const flipSvc=run(async id=>{const s=svc(id);await DB.update('services',id,{on:s.on===false});await DB.set('log',uid(),logDoc((s.on===false?'Activated ':'Deactivated ')+s.name))});
+const addTh=run(async()=>{const n=$('#tn').value.trim(),sp=$('#ts').value.trim();if(!n)return toast('Enter the therapist’s name.');
+  await DB.set('therapists',uid(),{name:n,spec:sp,on:true});await DB.set('log',uid(),logDoc('Added therapist: '+n))});
+const flip=run(async id=>{const t=thr(id);await DB.update('therapists',id,{on:!t.on});await DB.set('log',uid(),logDoc((t.on?'Deactivated ':'Activated ')+t.name))});
+const saveSettings=run(async()=>{const h=+$('#hm').value,c=+$('#co').value,v=+$('#vh').value,o=$('#to').value,cl=$('#tc').value,ef=$('#ef').value,et=$('#et').value,tr=+$('#tr').value;
+  if(!(h>=5&&h<=120)||!(c>=0&&c<=72)||!(v>=0&&v<=24))return toast('Hold time must be 5 to 120 minutes, the cutoff 0 to 72 hours, and the staff limit 0 to 24 hours.');
+  if(!o||!cl||toMin(o)>=toMin(cl)||!ef||!et||toMin(ef)>=toMin(et)||!(tr>=0&&tr<=180))return toast('Opening time must be before the last start time, the early bird start before its end, and travel time 0 to 180 minutes.');
+  await DB.set('settings','main',{holdMin:h,cutoffH:c,verifyH:v,open:o,lastStart:cl,earlyFrom:ef,earlyTo:et,travelMin:tr});await DB.set('log',uid(),logDoc('Policy changed: hold '+h+' min, cutoff '+c+' h, staff limit '+v+' h, open '+o+', last start '+cl+', early bird '+ef+'-'+et+', travel '+tr+' min'));toast('Policy saved.')});
+const addStaff=run(async()=>{const n=$('#sn2').value.trim(),e=$('#se').value.trim().toLowerCase(),pw=$('#sw').value,r=$('#sr').value;
+  if(!n||!/^\S+@\S+\.\S+$/.test(e)||pw.length<6)return toast('Enter a name, a valid email, and a password of at least 6 characters.');
+  if(r==='therapist'&&!$('#st').value)return toast('Add a therapist profile first.');
+  try{await DB.createAccount({email:e,name:n,role:r,thId:r==='therapist'?$('#st').value:null},pw)}
+  catch(x){if(x.message==='exists'||x.code==='auth/email-already-in-use')return toast('That email already has an account.');throw x}
+  await DB.set('log',uid(),logDoc('Created '+r+' account for '+n));toast('Account created. They can log in from the Staff tab.')});
+const delAcc=run(async id=>{const u=D.users.find(x=>x.id===id);await DB.del('users',id);await DB.set('log',uid(),logDoc('Removed account '+(u?u.email:id)))});
+const M=(cat,name,mins,price,extra)=>({cat,name,mins,price,...extra});
+const MENU=[
+ M('Massage','Full Body Massage w/ Hot Compress (Combination)',60,450),M('Massage','Swedish Massage',60,450),M('Massage','Deep Tissue Massage',60,450),
+ M('Massage','Therapeutic Massage w/ Hilot',90,550),M('Massage','Reflexology',60,450),M('Massage','Hilot (Pilay, Ipit Ugat, Lagnat, Taas Matres)',20,300),
+ M('Massage','Back Massage',20,300),M('Massage','Back Massage w/ Hotstone or Ventosa',45,400),M('Massage','Half Body (Lying)',30,400),
+ M('Massage','Half Body w/ Ventosa or Hotstone',60,450),M('Massage','Foot Massage',30,350),M('Massage','Baby Massage (5 years old below)',30,275),
+ M('Massage','Full Body Massage, Young Adult (6 to 12 yrs old)',60,400),
+ M('Combo Package','Full Body Massage w/ Hotstone or Ventosa',90,550,{promo:450}),M('Combo Package','Full Body Massage w/ Ear Candling',75,550),
+ M('Combo Package','Full Body Massage w/ Scanning Ventosa',90,550),M('Combo Package','Foot Scrub w/ Foot Massage',30,550),
+ M('Combo Package','Therapeutic w/ Ventosa or Hotstone',90,700),M('Combo Package','Steam Sauna',105,800),M('Combo Package','Body Scrub',105,850),
+ M('Other','Steam Inhalation (Suob)',30,0,{on:false}),                         // price and time to be set by the owner, then activate
+ M('Home Service','Home Service (1 hour)',60,750,{home:true})];
+const THERAPISTS=['Ella','Delia','Cha','Lanny','Karl','Tata','Klent'];
+const DAYOFF={Ella:[1],Delia:[2],Klent:[2],Lanny:[3],Cha:[4]};   // from the spa's printed "Schedule of Day Off" (0 = Sunday ... 6 = Saturday); Klent takes the Tuesday slot
+const menuGap=()=>({svc:MENU.filter(m=>!D.services.some(x=>x.name===m.name)),th:THERAPISTS.filter(n=>!D.therapists.some(t=>t.name===n)),off:D.therapists.filter(t=>DAYOFF[t.name]&&!(t.off||[]).length)});
+const loadMenu=run(async()=>{
+  const g=menuGap();if(!g.svc.length&&!g.th.length&&!g.off.length)return toast('The menu is already complete.');
+  if(!confirm('Add '+g.svc.length+' services and '+g.th.length+' therapists, and set '+g.off.length+' existing days off?'))return;
+  for(const m of g.svc)await DB.set('services',uid(),{name:m.name,mins:m.mins,price:m.price,cat:m.cat,promo:m.promo||null,home:!!m.home,on:m.on!==false});
+  for(const n of g.th)await DB.set('therapists',uid(),{name:n,spec:'',off:DAYOFF[n]||[],on:true});
+  for(const t of g.off)await DB.update('therapists',t.id,{off:DAYOFF[t.name]});
+  if(!D.services.length)await DB.set('settings','main',{...DEFAULTS});
+  await DB.set('log',uid(),logDoc('Loaded menu items: '+g.svc.length+' services, '+g.th.length+' therapists'));toast('JENDELL menu updated.')});
+const backup=run(async()=>{download('jendellbook-backup-'+dkey(new Date())+'.json',JSON.stringify(await DB.exportAll(),null,1),'application/json');toast('Backup downloaded.')});
+const restoreFile=run(async el=>{const f=el.files[0];if(!f)return;if(!confirm('Replace ALL current data with this backup?'))return;
+  await DB.importAll(JSON.parse(await f.text()));S.user=null;toast('Backup restored. Please log in again.')});
+const resetDemo=run(async()=>{if(!confirm('Erase everything saved in this browser and restore the sample data?'))return;await Local.reset();S.user=null;S.mode='client';toast('Demo data reset.')});
+function csv(){const safe=c=>{c=String(c??'');return '"'+(/^[=+\-@]/.test(c)?"'"+c:c).replace(/"/g,'""')+'"'};
+  const rows=[['Booking','Client','Service','Therapist','Date','Time','Price','Status','Payment proofs']];
+  D.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).forEach(a=>rows.push([a.id,a.who,svc(a.svc).name,thr(a.th).name,a.date,a.time,a.price??svc(a.svc).price,a.status,(a.proofs||[]).map(p=>p.ref+':'+p.st).join(' | ')]));
+  download('jendellbook-bookings-'+dkey(new Date())+'.csv',rows.map(r=>r.map(safe).join(',')).join('\n'),'text/csv')}
+
+/* ---- timer: release held slots whose time ran out, update countdowns ---- */
+function tick(){
+  if(S.user&&S.ready&&S.user.role!=='therapist'){
+    D.appointments.forEach(a=>{if(['Pending Payment','Pending Verification'].includes(a.status)&&a.holdUntil&&Date.now()>a.holdUntil&&!S.exp.has(a.id)&&(S.user.role!=='client'||a.cid===S.user.uid)){S.exp.add(a.id);expire(a.id)}})}
+  document.querySelectorAll('[data-hold]').forEach(e=>{const s=Math.max(0,Math.floor((+e.dataset.hold-Date.now())/1000));e.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')})}
+setInterval(tick,1000);
+
+/* ---- views ---- */
+const stat=(n,l,alert)=>`<div class="stat${alert&&n>0?' alert':''}"><b>${n}</b><span>${l}</span></div>`;
+const head=(h,l)=>`<div class="pagehead"><h1>${h}</h1><p class="lead">${l}</p></div>`;
+const optSvc=(list,cur)=>{const cats=[...new Set(list.map(x=>x.cat||''))];
+  return cats.map(c=>{const o=list.filter(x=>(x.cat||'')===c).map(x=>`<option value="${x.id}" ${x.id===cur?'selected':''}>${esc(x.name)} · ${fmtMins(x.mins)} · ${x.price>0?'₱'+x.price:'price not set yet'}${x.home?' · home service':''}${x.promo?' (early bird ₱'+x.promo+')':''}</option>`).join('');return c?`<optgroup label="${esc(c)}">${o}</optgroup>`:o}).join('')};
+const optTh=(list,cur)=>list.map(x=>`<option value="${x.id}" ${x.id===cur?'selected':''}>${esc(x.name)}${x.spec?' ('+esc(x.spec)+')':''}</option>`).join('');
+const thCard=t=>t?`<div class="prof">${t.photo?`<img src="${esc(t.photo)}" alt="Photo of ${esc(t.name)}">`:`<span class="ini">${esc((t.name||'?')[0])}</span>`}<div><b>${esc(t.name)}</b><p>${esc(t.spec||'JENDELL therapist')}</p></div></div>`:'';
+function chipsDay(cur,fn){return days().map(d=>`<button class="chip" aria-pressed="${d.key===cur}" onclick="${fn}('day','${d.key}')">${d.label}</button>`).join('')}
+function chipsTime(th,day,cur,sv,fn,mine){return times().map(t=>`<button class="chip" aria-pressed="${t===cur}" ${free(th,day,t,sv,mine)?'':'disabled'} onclick="${fn}('time','${t}')">${t}</button>`).join('')}
+function client(){
+  const s=S.sel,ths=D.therapists.filter(t=>t.on),sv=D.services.filter(x=>x.on!==false),mine=D.appointments.filter(a=>a.cid===S.user.uid).sort((a,b)=>b.created-a.created);
+  if(!s.day||!days().some(d=>d.key===s.day))s.day=days()[0].key;
+  if(!sv.find(x=>x.id===s.svc))s.svc=sv[0]&&sv[0].id;if(!ths.find(t=>t.id===s.th))s.th=ths[0]&&ths[0].id;
+  const m=svc(s.svc).mins,ready=sv.length&&ths.length;
+  const form=!ready?'<p class="empty">The spa has not published its services and therapists yet. Please check back soon.</p>':`
+   <label for="svc">Service</label><select id="svc" onchange="pick('svc',this.value)">${optSvc(sv,s.svc)}</select>
+   <label for="th">Therapist</label><select id="th" onchange="pick('th',this.value)">${optTh(ths,s.th)}</select>${thCard(thr(s.th))}
+   <label>Day</label><div class="chips">${chipsDay(s.day,'pick')}</div>
+   <label>Time</label><div class="chips">${chipsTime(s.th,s.day,s.time,svc(s.svc),'pick',S.resch)}</div>${offNote(s.th,s.day)}
+   ${svc(s.svc).home?`<label for="addr">Home address (where the therapist should go)</label><input type="text" id="addr" autocomplete="street-address" placeholder="House no., street, barangay, city">`:''}
+   <p class="note">Struck-through times are already booked or have passed. This service takes ${fmtMins(m)}.${svc(s.svc).promo?' Early bird price ₱'+svc(s.svc).promo+' for sessions that start from '+D.settings.earlyFrom+' and finish by '+D.settings.earlyTo+', Monday to Friday.':''}${s.time?' <b>Price for '+s.time+': ₱'+priceAt(svc(s.svc),s.day,s.time)+(priceAt(svc(s.svc),s.day,s.time)<svc(s.svc).price?' (early bird)':'')+'</b>':''}</p>
+   <div class="tools"><button class="btn" onclick="book()">${S.resch?'Move booking':'Hold this slot'}</button>${S.resch?'<button class="btn ghost" onclick="cancelResch()">Keep original time</button>':''}</div>
+   ${DB.mode==='local'?`<label style="font-weight:400"><input type="checkbox" ${S.race?'checked':''} onchange="S.race=this.checked"> Test the conflict check: let another client grab the chosen slot first</label>`:''}`;
+  return head('Hi, '+esc(S.user.name.split(' ')[0])+'. Book a massage','Pick a service, therapist, and time. Your slot is held for '+D.settings.holdMin+' minutes while you send the ₱100 reservation fee through GCash. Once your proof is in, the timer stops until staff verify it.')+
+  `<ol class="steps"><li><span class="n">1</span><span>Choose a service, therapist, and time</span></li><li><span class="n">2</span><span>Send the ₱100 GCash reservation fee</span></li><li><span class="n">3</span><span>Get your confirmation by SMS</span></li></ol>
+  <div class="grid"><section class="panel"><h2>${S.resch?'Reschedule booking':'New booking'}</h2>${form}</section>
+  <section class="panel"><h2>My bookings</h2>${mine.length?mine.map(a=>{const lp=(a.proofs||[])[(a.proofs||[]).length-1];return `<div class="row"><div style="flex:1;min-width:0"><b>${esc(svc(a.svc).name)}</b><p>${esc(thr(a.th).name)} · ${when(a)} · ₱${a.price??svc(a.svc).price}</p>
+   ${a.status==='Pending Payment'?`<div class="proof"><b>Send your ₱100 reservation fee</b><p>Send ₱100 to JENDELL’s GCash (sample number: 0917 000 1234), then enter the reference number from your receipt. The screenshot should show the amount and reference number.</p><p class="hold">Slot held for <span data-hold="${a.holdUntil}"></span></p>${lp&&lp.st==='Rejected'?`<p class="tag">Your last proof (${esc(lp.ref)}) was rejected. Send a corrected one.</p>`:''}
+     <label for="ref${a.id}">GCash reference number</label><input type="text" id="ref${a.id}" inputmode="text" autocomplete="off">
+     <label for="file${a.id}">Screenshot of payment</label><input type="file" id="file${a.id}" accept="image/*">
+     <div class="tools"><button class="btn sm" onclick="sendProof('${a.id}')">Send proof</button><button class="btn sm ghost" onclick="cancelAppt('${a.id}')">Cancel</button></div></div>`:''}
+   ${a.status==='Pending Verification'?`<p>Waiting for staff to verify your payment. Your slot stays reserved.${a.holdUntil?` <span class="hold">Time left: <span data-hold="${a.holdUntil}"></span></span>`:''}</p>`:''}${(a.proofs||[]).length?`<p>Proofs sent: ${a.proofs.map(q=>esc(q.ref)+' ('+q.st+')').join(', ')}</p>`:''}
+   ${['Pending Verification','Confirmed'].includes(a.status)?(canChange(a)?`<div class="tools"><button class="btn sm ghost" onclick="resch('${a.id}')">Reschedule</button><button class="btn sm ghost" onclick="cancelAppt('${a.id}')">Cancel</button></div>`:`<p class="note">Changes close ${D.settings.cutoffH} hours before the appointment. Please call the spa.</p>`):''}</div>${pill(a.status)}</div>`}).join(''):'<p class="empty">No bookings yet. Choose a slot on the left to start.</p>'}</section></div>
+  <section class="panel gap"><h2>SMS notifications</h2><p class="empty">Texts are sent to ${esc(S.user.phone||'your mobile number')}.</p>${D.notes.length?D.notes.filter(x=>x.to===S.user.uid).map(x=>`<div class="row"><div>${esc(x.m)}<p>SMS to ${esc(x.ph||'—')} · ${fmt(x.t)} · ${x.m.length}/160 characters</p></div></div>`).join(''):'<p class="empty">Confirmations, rejections, and reminders arrive as text messages and appear here too.</p>'}</section>`}
+
+function walkPanel(){
+  const w=S.walk,sv=D.services.filter(x=>x.on!==false),ths=D.therapists.filter(t=>t.on);
+  if(!w.day||!days().some(d=>d.key===w.day))w.day=days()[0].key;
+  if(!sv.find(x=>x.id===w.svc))w.svc=sv[0]&&sv[0].id;if(!ths.find(t=>t.id===w.th))w.th=ths[0]&&ths[0].id;
+  if(!sv.length||!ths.length)return `<section class="panel gap"><h2>Walk-in or phone booking</h2><p class="empty">Add at least one service and one therapist (Admin tab) first.</p></section>`;
+  const m=svc(w.svc).mins;
+  return `<section class="panel gap"><h2>Walk-in or phone booking</h2><p class="empty">Enter a booking for someone who called or walked in. It is confirmed right away.</p>
+   <label for="wn">Client name</label><input type="text" id="wn" value="${esc(w.name||'')}">
+   <label for="ws">Service</label><select id="ws" onchange="wpick('svc',this.value)">${optSvc(sv,w.svc)}</select>
+   <label for="wt">Therapist</label><select id="wt" onchange="wpick('th',this.value)">${optTh(ths,w.th)}</select>
+   <label>Day</label><div class="chips">${chipsDay(w.day,'wpick')}</div>
+   <label>Time</label><div class="chips">${chipsTime(w.th,w.day,w.time,svc(w.svc),'wpick')}</div>${offNote(w.th,w.day)}
+   ${svc(w.svc).home?`<label for="wa">Home address</label><input type="text" id="wa">`:''}
+   <div class="tools" style="margin-top:14px"><button class="btn" onclick="walkIn()">Save booking</button></div></section>`}
+function reportPanel(){
+  const live=D.appointments.filter(a=>LIVE.includes(a.status));
+  const by=(l,f)=>l.map(x=>({n:x.name,c:live.filter(a=>a[f]===x.id).length}));
+  const bars=r=>{const m=Math.max(1,...r.map(x=>x.c));return '<table>'+r.map(x=>`<tr><td>${esc(x.n)}</td><td style="width:50%"><div class="bar" style="width:${x.c/m*100}%"></div></td><td>${x.c}</td></tr>`).join('')+'</table>'};
+  return `<section class="panel gap"><h2>Reports</h2><p class="empty">${live.length} active bookings, ${D.appointments.filter(a=>a.status==='Completed').length} completed, ${D.appointments.filter(a=>a.status==='Cancelled').length} cancelled.</p>
+   <h3>Appointment volume by day</h3>${bars(days().map(d=>({n:d.label,c:live.filter(a=>a.date===d.key).length})))}
+   <h3>Service demand</h3>${bars(by(D.services,'svc'))}<h3>Therapist workload</h3>${bars(by(D.therapists,'th'))}
+   <div class="tools" style="margin-top:14px"><button class="btn sm ghost" onclick="csv()">Export bookings (CSV)</button></div></section>`}
+function staff(){
+  const q=D.appointments.filter(a=>a.status==='Pending Verification'),today=dkey(new Date());
+  const all=D.appointments.slice().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  const live=D.appointments.filter(a=>LIVE.includes(a.status));
+  return head('Front desk','Check each submitted reference number and screenshot against the spa’s GCash history, then verify or reject.')+
+  `<div class="stats">${stat(q.length,'Awaiting verification',true)}${stat(live.filter(a=>a.date===today).length,'Appointments today')}${stat(D.appointments.filter(a=>a.status==='Confirmed').length,'Confirmed bookings')}${stat(D.appointments.filter(a=>a.status==='Completed').length,'Completed')}</div>
+  <section class="panel"><h2>Payment verification queue</h2>${q.length?q.map(a=>{const p=a.proofs[a.proofs.length-1];return `<div class="row"><div><b>${esc(a.who)}</b> · ${esc(svc(a.svc).name)}<p>${esc(thr(a.th).name)} · ${when(a)}</p>${a.addr?`<p>Home service: ${esc(a.addr)}</p>`:''}<p>Reference: <b>${esc(p.ref)}</b> · Sent ${p.at?fmt(p.at):''}</p>${a.holdUntil?`<p class="hold">Slot is released in: <span data-hold="${a.holdUntil}"></span></p>`:''}${p.url?`<img class="thumb" alt="Payment screenshot from ${esc(a.who)}" src="${esc(p.url)}" onclick="showImg(this.src)">`:`<p>Screenshot: ${esc(p.file)}</p>`}</div>
+   <div class="tools"><button class="btn sm" onclick="decide('${a.id}',true)">Verify</button><button class="btn sm bad" onclick="decide('${a.id}',false)">Reject</button></div></div>`}).join(''):'<p class="empty">Nothing to verify. New proofs appear here when a client sends one.</p>'}</section>
+  <section class="panel gap"><h2>Schedule across all therapists</h2><div class="scroll"><table><tr><th>When</th><th>Therapist</th><th>Client</th><th>Service</th><th>Status</th></tr>
+   ${all.map(a=>`<tr><td>${when(a)}</td><td>${esc(thr(a.th).name)}</td><td>${esc(a.who)}${a.addr?'<br><small>Home service: '+esc(a.addr)+'</small>':''}</td><td>${esc(svc(a.svc).name)}</td><td>${pill(a.status)}${a.status==='Confirmed'&&a.cid?` <button class="btn sm ghost" onclick="remind('${a.id}')">Send SMS reminder</button>`:''}${['Pending Payment','Pending Verification','Confirmed'].includes(a.status)?` <button class="btn sm ghost" onclick="cancelAppt('${a.id}')">Cancel</button>`:''}</td></tr>`).join('')}</table></div></section>`+walkPanel()+reportPanel()}
+function therapist(){
+  const me=thr(S.thView),mine=D.appointments.filter(a=>a.th===S.thView&&['Confirmed','Completed'].includes(a.status)).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)),today=dkey(new Date());
+  return head('My schedule','Therapists see only their own confirmed appointments.')+
+  `<div class="stats">${stat(mine.filter(a=>a.status==='Confirmed'&&a.date===today).length,'Appointments today')}${stat(mine.filter(a=>a.status==='Confirmed').length,'Upcoming confirmed')}${stat(mine.filter(a=>a.status==='Completed').length,'Completed')}</div>
+  <section class="panel">${thCard(me)}
+  <div style="margin-top:16px">${mine.length?mine.map(a=>`<div class="row"><div><b>${when(a)}</b><p>${esc(a.who)} · ${esc(svc(a.svc).name)}</p>${a.addr?`<p>Home service: ${esc(a.addr)}</p>`:''}</div>
+   <div>${a.status==='Confirmed'?`<button class="btn sm" onclick="complete('${a.id}')">Mark completed</button>`:pill('Completed')}</div></div>`).join(''):'<p class="empty">No confirmed appointments yet.</p>'}</div></section>`}
+function accPanel(){
+  const us=D.users.filter(a=>a.role!=='client');
+  return `<section class="panel gap"><h2>Staff accounts</h2>${us.map(a=>`<div class="row"><div><b>${esc(a.name)}</b><p>${esc(a.email)} · ${a.role}</p></div>${a.id===S.user.uid?'':`<button class="btn sm ghost" onclick="delAcc('${a.id}')">Remove</button>`}</div>`).join('')||'<p class="empty">No staff accounts yet.</p>'}
+   <label for="sn2">Add an account</label><input type="text" id="sn2" placeholder="Full name"><div class="tools" style="margin:8px 0"><input type="email" id="se" placeholder="Email" style="flex:1"><input type="password" id="sw" placeholder="Temporary password" style="flex:1"></div>
+   <div class="tools"><select id="sr" style="flex:1"><option value="staff">Front desk</option><option value="therapist">Therapist</option></select><select id="st" style="flex:1">${D.therapists.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('')}</select></div>
+   <p class="note">For a therapist account, choose which therapist profile it belongs to.${DB.mode==='firebase'?' Removing an account deletes its JendellBook profile; delete the login itself in the Firebase console.':''}</p><button class="btn sm" onclick="addStaff()">Create account</button></section>`}
+function admin(){
+  const st=D.settings,live=D.appointments.filter(a=>LIVE.includes(a.status));
+  return head('Administration','Manage services and therapists, set the booking policy, and review who did what.')+
+  `<div class="stats">${stat(D.appointments.filter(a=>a.status==='Pending Verification').length,'Awaiting verification',true)}${stat(live.length,'Active bookings')}${stat(D.services.filter(x=>x.on!==false).length,'Active services')}${stat(D.therapists.filter(t=>t.on).length,'Active therapists')}</div>
+  <div class="grid"><div><section class="panel"><h2>Services</h2>${D.services.map(x=>S.edit&&S.edit.k==='svc'&&S.edit.id===x.id?`<div class="row" style="display:block"><label for="en">Name</label><input type="text" id="en" value="${esc(x.name)}"><div class="tools" style="margin:8px 0"><input type="number" id="em" value="${x.mins}" aria-label="Minutes" style="flex:1"><input type="number" id="ep" value="${x.price}" aria-label="Price" style="flex:1"><input type="number" id="epr" value="${x.promo||''}" placeholder="Early bird ₱" aria-label="Early bird price" style="flex:1"></div><input type="text" id="ec" value="${esc(x.cat||'')}" placeholder="Group, e.g. Massage or Combo Package"><div class="tools" style="margin-top:8px"><button class="btn sm" onclick="saveSvc('${x.id}')">Save</button><button class="btn sm ghost" onclick="editOff()">Cancel</button></div></div>`:`<div class="row"><div><b>${esc(x.name)}</b><p>${fmtMins(x.mins)} · ${x.price>0?'₱'+x.price:'price not set yet'}${x.home?' · home service':''}${x.promo?' · early bird ₱'+x.promo:''}${x.cat?' · '+esc(x.cat):''}${x.on===false?' · inactive':''}</p></div><div class="tools"><button class="btn sm ghost" onclick="editOn('svc','${x.id}')">Edit</button><button class="btn sm ghost" onclick="flipSvc('${x.id}')">${x.on===false?'Set active':'Set inactive'}</button></div></div>`).join('')||`<p class="empty">No services yet.</p>`}${(()=>{const g=menuGap();return g.svc.length||g.th.length||g.off.length?`<p class="note"><button class="link" onclick="loadMenu()">Add ${g.svc.length} missing menu items and ${g.th.length} missing therapists${g.off.length?', and set the printed days off for '+g.off.length+' therapists':''}</button></p>`:''})()}
+   <label for="sn">Add a service</label><input type="text" id="sn" placeholder="Service name"><div class="tools" style="margin:8px 0"><input type="number" id="sm" placeholder="Minutes" style="flex:1"><input type="number" id="sp" placeholder="Price (₱)" style="flex:1"></div>
+   <button class="btn sm" onclick="addSvc()">Add service</button></section>
+  <section class="panel gap"><h2>Booking policy</h2><label for="hm">Client has this long to send payment proof (minutes)</label><input type="number" id="hm" value="${st.holdMin}"><label for="co">Client can cancel or reschedule up to (hours before)</label><input type="number" id="co" value="${st.cutoffH}">
+   <label for="vh">Staff must verify within (hours, 0 = no limit)</label><input type="number" id="vh" value="${st.verifyH||0}">
+   <label for="to">Opening time</label><input type="time" id="to" value="${st.open}"><label for="tc">Last start time (last client accepted)</label><input type="time" id="tc" value="${st.lastStart}">
+   <label for="ef">Early bird: sessions start from</label><input type="time" id="ef" value="${st.earlyFrom}"><label for="et">Early bird: sessions must finish by</label><input type="time" id="et" value="${st.earlyTo}">
+   <label for="tr">Home service travel time, each way (minutes)</label><input type="number" id="tr" value="${st.travelMin||0}"><p class="note">The early bird price applies Monday to Friday. A session that started by the last start time may finish after closing. Changing these does not cancel bookings that already exist.</p>
+   <div class="tools" style="margin-top:12px"><button class="btn sm" onclick="saveSettings()">Save policy</button></div></section></div>
+  <div><section class="panel"><h2>Therapists</h2>${D.therapists.map(t=>S.edit&&S.edit.k==='th'&&S.edit.id===t.id?`<div class="row" style="display:block"><label for="etn">Name</label><input type="text" id="etn" value="${esc(t.name)}"><label for="ets">Specialty</label><input type="text" id="ets" value="${esc(t.spec||'')}"><label>Weekly day off</label><div class="chips" id="eoff">${DAYN.map((d,i)=>`<label class="chip" style="display:inline-flex;gap:6px;align-items:center;margin:0"><input type="checkbox" value="${i}" ${(t.off||[]).includes(i)?'checked':''}> ${d}</label>`).join('')}</div><label for="etp">Photo (optional)</label><input type="file" id="etp" accept="image/*"><div class="tools" style="margin-top:8px"><button class="btn sm" onclick="saveTh('${t.id}')">Save</button><button class="btn sm ghost" onclick="editOff()">Cancel</button></div></div>`:`<div class="row"><div style="display:flex;gap:10px;align-items:center">${t.photo?`<img src="${esc(t.photo)}" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover">`:''}<div><b>${esc(t.name)}</b><p>${esc(t.spec||'No specialty set')}${(t.off||[]).length?' · Day off: '+t.off.map(i=>DAYN[i]).join(', '):''}${t.on?'':' · inactive'}</p></div></div><div class="tools"><button class="btn sm ghost" onclick="editOn('th','${t.id}')">Edit</button><button class="btn sm ghost" onclick="flip('${t.id}')">${t.on?'Set inactive':'Set active'}</button></div></div>`).join('')||'<p class="empty">No therapists yet.</p>'}
+   <label for="tn">Add a therapist</label><div class="tools" style="margin:0 0 8px"><input type="text" id="tn" placeholder="Name" style="flex:1"><input type="text" id="ts" placeholder="Specialty" style="flex:1"></div><button class="btn sm" onclick="addTh()">Add therapist</button></section>
+  <section class="panel gap"><h2>Audit log</h2>${D.log.length?D.log.map(l=>`<div class="row"><div>${esc(l.a)}<p>${fmt(l.at)} · ${esc(l.by||'')} (${esc(l.role)})</p></div></div>`).join(''):'<p class="empty">Approvals, rejections, and other changes are recorded here.</p>'}</section></div></div>`+accPanel()+
+  `<section class="panel gap"><h2>Backup</h2><p class="empty">Download a copy of all bookings, services, therapists, and settings.</p><div class="tools" style="margin-top:10px"><button class="btn sm" onclick="backup()">Download backup (JSON)</button>
+   ${DB.mode==='local'?`<label class="btn sm ghost" style="display:inline-block;margin:0;cursor:pointer">Restore backup<input type="file" accept="application/json" hidden onchange="restoreFile(this)"></label>`:''}</div></section>`}
+function banner(){
+  if(S.fatal)return `<div class="banner err">${esc(S.fatal)}</div>`;
+  return DB.mode==='local'?`<div class="banner">Demo mode: bookings are saved in this browser only, so they are not shared between devices. <button class="link" onclick="resetDemo()">Reset demo data</button></div>`
+    :`<div class="banner ok">Connected to Firebase project ${esc(FIREBASE_CONFIG.projectId)}. Bookings update live on every device.</div>`}
+function render(){
+  const f=document.activeElement;S.dirty=false;
+  if(!S.ready){return}
+  document.body.classList.toggle('is-auth',!S.user);
+  $('#tabs').innerHTML=S.user?`<span class="avatar" aria-hidden="true">${esc((S.user.name||'?')[0].toUpperCase())}</span><span class="wn">${esc(S.user.name)}<small>${esc(S.user.role)}</small></span><button class="btn sm ghost" onclick="logOut()">Log out</button>`:'';
+  if(!DB){$('#app').innerHTML=banner();return}
+  $('#app').innerHTML=banner()+(S.user?{client,staff,therapist,admin}[S.user.role]():auth());tick()}
+/* A live update from the database must not wipe what someone is typing */
+function onData(){const a=document.activeElement;
+  if(a&&a.closest&&a.closest('#app')&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)){S.dirty=true;return}render()}
+addEventListener('focusout',()=>{if(S.dirty)setTimeout(()=>{const a=document.activeElement;if(!(a&&a.closest&&a.closest('#app')&&/^(INPUT|SELECT|TEXTAREA)$/.test(a.tagName)))render()},80)});
+
+async function boot(){
+  $('#yr').textContent=new Date().getFullYear();
+  try{
+    DB=FIREBASE_CONFIG?await makeFirebase(FIREBASE_CONFIG):Local;
+    DB.on(onData);await DB.init();
+    const p=await DB.restore();if(p){S.user=p;S.thView=p.thId||null;await DB.startSync(p)}
+  }catch(e){console.error(e);S.fatal='Could not start the database: '+(e.message||e)+'. Check your Firebase settings, or set FIREBASE_CONFIG to null to use demo mode.';if(!DB)DB=Local}
+  S.ready=true;render()}
+boot();
+</script>
+</body>
+</html>
